@@ -1,0 +1,12 @@
+use_frameworks!
+platform :ios, '11.0'
+
+target 'NavigationAndStyle_Example' do
+  pod 'NavigationAndStyle', :path => '../'
+
+  target 'NavigationAndStyle_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

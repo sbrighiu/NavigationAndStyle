@@ -1,0 +1,16 @@
+PODS:
+  - NavigationAndStyle (1.0.0)
+
+DEPENDENCIES:
+  - NavigationAndStyle (from `../`)
+
+EXTERNAL SOURCES:
+  NavigationAndStyle:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  NavigationAndStyle: fbf715ed31a66ae30beeb1790e1d61d6026ccbc3
+
+PODFILE CHECKSUM: 8ba718437802f4557b5583713a040f76e8109ac7
+
+COCOAPODS: 1.6.1
