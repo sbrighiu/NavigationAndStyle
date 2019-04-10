@@ -8,17 +8,12 @@ import NavigationAndStyle
 class SetupTests: BaseTestCase {
     
     override func setUp() {
-        ViewControllerColorStyle.Constants.defaultColorStyle = ViewControllerColorStyle(statusBarStyle: .default,
-                                                                                        background: .clear,
-                                                                                        shadow: .black,
-                                                                                        primary: .white,
-                                                                                        secondary: .white,
-                                                                                        underlineShadow: .red)
-    }
-    
-    func test_setupNotCalled() {
-        makeSUT()
-        XCTAssertFalse(rootVC.didSetupCustomNavigationAndStyle)
+        ColorStyle.Defaults.globalStyle = ColorStyle(statusBarStyle: .default,
+                                                     background: .clear,
+                                                     shadow: .black,
+                                                     primary: .white,
+                                                     secondary: .white,
+                                                     third: .white)
     }
     
     func test_modalVC() {
@@ -31,25 +26,27 @@ class SetupTests: BaseTestCase {
         makeSUT()
         
         let scrollView = createAndAddScrollView(to: rootVC.view)
-        let (_, _, _, navBar, shadowView) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
+        let (_, _, _, navBar, _, shadowView) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
         
-        XCTAssert(navBar?.superview === scrollView)
+        XCTAssert(navBar.superview === scrollView)
         XCTAssert(shadowView!.superview === scrollView)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
     func test_navVC() {
         makeNavSUT()
-        let (_, _, _, navBar, shadowView) = rootNavVC.set(title: anyText,
-                                                          left: [.image(UIImage.Placeholders.backArrow)],
-                                                          right: [.image(UIImage.Placeholders.forwardArrow)])
+        let (_, _, _, navBar, _, shadowView) = rootNavVC.set(title: anyText,
+                                                             left: [.image(UIImage.NavigationAndStyle.backArrow)],
+                                                             right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
         
         let navC = rootNavVC.navigationController!
         XCTAssert(navC.navigationBar === navBar)
         XCTAssert(shadowView!.superview === rootNavVC.view)
         XCTAssert(navC.delegate === (navC as UINavigationControllerDelegate))
         XCTAssert(navC.interactivePopGestureRecognizer!.delegate === (navC as UINavigationControllerDelegate))
-        XCTAssert(navC.navigationBar.isTranslucent == rootNavVC.getColorStyle().isTranslucent)
+        if let _ = rootNavVC.getColorStyle() {
+            XCTAssert(navC.navigationBar.isTranslucent == true)
+        }
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
     }
     
@@ -57,7 +54,7 @@ class SetupTests: BaseTestCase {
         makeNavSUT()
         
         let scrollView = createAndAddScrollView(to: rootNavVC.view)
-        let (_, _, _, _, shadowView) = rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
+        let (_, _, _, _, _, shadowView) = rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
         
         XCTAssert(shadowView!.superview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
@@ -98,7 +95,7 @@ class SetupTests: BaseTestCase {
         rootVC.set(title: anyText,
                    right: [NavBarItemType.title(anyText),
                            NavBarItemType.title(otherText),
-                           NavBarItemType.image(UIImage.Placeholders.close)])
+                           NavBarItemType.image(UIImage.NavigationAndStyle.close)])
         
         XCTAssert(rootVC.navigationItem.rightBarButtonItems!.count == 3)
     }
@@ -177,7 +174,7 @@ class SetupTests: BaseTestCase {
         rootVC.set(title: anyText,
                    right: [NavBarItemType.title(anyText),
                            NavBarItemType.imageAndTitle(anyImage, title: otherText),
-                           NavBarItemType.image(UIImage.Placeholders.close)])
+                           NavBarItemType.image(UIImage.NavigationAndStyle.close)])
         
         XCTAssert(rootVC.navigationItem.rightBarButtonItems!.count == 3)
         
@@ -188,7 +185,7 @@ class SetupTests: BaseTestCase {
         rootVC.set(title: anyText,
                    right: [NavBarItemType.title(anyText),
                            NavBarItemType.title(otherText),
-                           NavBarItemType.image(UIImage.Placeholders.close)])
+                           NavBarItemType.image(UIImage.NavigationAndStyle.close)])
         
         XCTAssert(rootVC.navigationItem.rightBarButtonItems!.count == 3)
     }

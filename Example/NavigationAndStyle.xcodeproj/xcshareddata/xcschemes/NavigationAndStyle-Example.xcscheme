@@ -46,7 +46,7 @@
       <CodeCoverageTargets>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F9AA2D8A7FB082D39EE1D41514E64AA2"
+            BlueprintIdentifier = "87B3B06F28AF0547D67147CB1F237112"
             BuildableName = "NavigationAndStyle.framework"
             BlueprintName = "NavigationAndStyle"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">

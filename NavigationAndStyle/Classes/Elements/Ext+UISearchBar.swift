@@ -5,25 +5,18 @@
 import Foundation
 import UIKit
 
-// This value masks the fact that UISearchBar does not support
-// removing the background shadow before rendering (UISearchController),
-// and by applying a white background and rounding the corners,
-// we hotfix this issue and leave the search bar looking
-// as clean as possible. This value should be bigger than 8-12.
-private let cornerRadiusForSearchBarHotfix: CGFloat = 34/2
-
 extension UISearchBar {
     
     fileprivate var textField: UITextField? {
         return self.value(forKey: "searchField") as? UITextField
     }
     
-    internal func setAppearance(with colorStyle: ViewControllerColorStyle) {
+    internal func setAppearance(with buttonTintColor: UIColor, and disabledColor: UIColor) {
         UIBarButtonItem.appearance(whenContainedInInstancesOf: [UISearchBar.self]).setTitleTextAttributes(
-            [NSAttributedString.Key.foregroundColor: colorStyle.buttonTint],
+            [NSAttributedString.Key.foregroundColor: buttonTintColor],
             for: .normal)
         UIBarButtonItem.appearance(whenContainedInInstancesOf: [UISearchBar.self]).setTitleTextAttributes(
-            [NSAttributedString.Key.foregroundColor: colorStyle.disabledTint],
+            [NSAttributedString.Key.foregroundColor: disabledColor],
             for: .disabled)
     }
     
@@ -37,8 +30,8 @@ extension UISearchBar {
                 backgroundView.backgroundColor = .white
                 backgroundView.clipsToBounds = true
                 
-                if backgroundView.layer.cornerRadius != cornerRadiusForSearchBarHotfix {
-                    backgroundView.layer.cornerRadius = cornerRadiusForSearchBarHotfix
+                if backgroundView.layer.cornerRadius != ColorStyle.Defaults.cornerRadiusForSearchBarHotfix {
+                    backgroundView.layer.cornerRadius = ColorStyle.Defaults.cornerRadiusForSearchBarHotfix
                 }
             }
         }

@@ -9,10 +9,11 @@ import UIKit
 class UsageTests: BaseTestCase {
     
     override func setUp() {
-        ViewControllerColorStyle.Constants.defaultColorStyle = ViewControllerColorStyle(statusBarStyle: .lightContent,
-                                                                                        background: .white,
-                                                                                        primary: .black,
-                                                                                        secondary: .black)
+        ColorStyle.Defaults.globalStyle = ColorStyle(statusBarStyle: .lightContent,
+                                                     background: .white,
+                                                     primary: .black,
+                                                     secondary: .black,
+                                                     third: .black)
     }
     
     func test_buttonActions() {
@@ -41,7 +42,7 @@ class UsageTests: BaseTestCase {
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons, _, _) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
+        let (_, leftButtons, rightButtons, _, _, _) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
         let buttonLeft1 = leftButtons.first!
         let buttonLeft2 = leftButtons.last!
         let buttonRight = rightButtons.first!
@@ -49,9 +50,9 @@ class UsageTests: BaseTestCase {
         XCTAssert(leftButtons.count == 2)
         XCTAssert(rightButtons.count == 1)
         
-        rootVC.perform(#selector(rootVC.pressedLeft(button:)), with: buttonLeft1)
-        rootVC.perform(#selector(rootVC.pressedLeft(button:)), with: buttonLeft2)
-        rootVC.perform(#selector(rootVC.pressedRight(button:)), with: buttonRight)
+        rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: buttonLeft1)
+        rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: buttonLeft2)
+        rootVC.perform(#selector(rootVC.pressedRight(item:)), with: buttonRight)
         
         waitForExpectations(timeout: 1.0, handler: nil)
         
@@ -72,7 +73,7 @@ class UsageTests: BaseTestCase {
         }
         makeSUT(titleViewSpyCallback: titleViewSpyCallback)
         
-        let (_, leftButtons, rightButtons, _, _) = rootVC.set(title: anyText)
+        let (_, leftButtons, rightButtons, _, _, _) = rootVC.set(title: anyText)
         let button = rootVC.change(titleToButtonWithTitle: anyText)
         
         XCTAssert(leftButtons.count == 0)
@@ -98,15 +99,15 @@ class UsageTests: BaseTestCase {
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons, navBar, _) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
+        let (_, leftButtons, rightButtons, navBar, _, _) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
         XCTAssert(leftButtons.first! == nil && leftButtons.last! == nil && leftButtons.count == 1)
         XCTAssert(rightButtons.first! == nil && rightButtons.last! == nil && leftButtons.count == 1)
         
-        let barItemLeft = navBar!.items!.last!.leftBarButtonItem!
-        let barItemRight = navBar!.items!.last!.rightBarButtonItem!
+        let barItemLeft = navBar.items!.last!.leftBarButtonItem!
+        let barItemRight = navBar.items!.last!.rightBarButtonItem!
         
-        rootVC.perform(#selector(rootVC.pressedSystemLeft(item:)), with: barItemLeft)
-        rootVC.perform(#selector(rootVC.pressedSystemRight(item:)), with: barItemRight)
+        rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: barItemLeft)
+        rootVC.perform(#selector(rootVC.pressedRight(item:)), with: barItemRight)
         
         waitForExpectations(timeout: 1.0, handler: nil)
     }

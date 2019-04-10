@@ -4,6 +4,7 @@
 
 import XCTest
 import UIKit
+import NavigationAndStyle
 
 class BaseTestCase: XCTestCase {
     var rootVC: UIViewController!
@@ -30,5 +31,17 @@ class BaseTestCase: XCTestCase {
             ])
         
         return scrollView
+    }
+    
+    func test_setupNotCalled() {
+        makeSUT()
+        XCTAssertFalse(rootVC.didSetupCustomNavigationAndStyle)
+    }
+    
+    func test_setupWithEmptyStyle() {
+        ColorStyle.Defaults.globalStyle = nil
+        makeSUT()
+        rootVC.set(title: anyText)
+        XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
 }
