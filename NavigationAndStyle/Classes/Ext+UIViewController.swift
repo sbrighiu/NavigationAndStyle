@@ -90,6 +90,9 @@ extension UIViewController: NavigationVC, Identifiable {
             (_, shadowView) = addOverlayNavigationBarElements(to: overrideModalSuperview ?? self.view)
         } else {
             shadowView = addShadowViewIfNeeded(to: self.view)
+            if let shadowView = shadowView {
+                shadowView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: shadowOverlayExtraHeight).isActive = true
+            }
         }
         
         let titleLabel = change(titleTo: title)
@@ -320,7 +323,7 @@ extension UIViewController {
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: superView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
             ])
         
         return imageView
