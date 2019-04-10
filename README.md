@@ -1,6 +1,6 @@
 # NavigationAndStyle
 
-[![CI Status](https://img.shields.io/travis/Stefan B./NavigationAndStyle.svg?style=flat)](https://travis-ci.org/Stefan B./NavigationAndStyle)
+[![CI Status](https://img.shields.io/travis/sbrighiu/NavigationAndStyle.svg?style=flat)](https://travis-ci.org/sbrighiu/NavigationAndStyle)
 [![Version](https://img.shields.io/cocoapods/v/NavigationAndStyle.svg?style=flat)](https://cocoapods.org/pods/NavigationAndStyle)
 [![License](https://img.shields.io/cocoapods/l/NavigationAndStyle.svg?style=flat)](https://cocoapods.org/pods/NavigationAndStyle)
 [![Platform](https://img.shields.io/cocoapods/p/NavigationAndStyle.svg?style=flat)](https://cocoapods.org/pods/NavigationAndStyle)
