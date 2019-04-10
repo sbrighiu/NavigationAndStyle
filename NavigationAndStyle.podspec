@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'NavigationAndStyle'
   s.version          = '1.0.0'
-  s.summary          = 'This is an extension on UIViewController that facilitates managing a navigation bar contents (regardless if an UINavigationController is present or not) and allows customizability.'
+  s.summary          = "Extension on UIViewController that allows the easy addition, configuration and styling of an UINavigationBar."
   
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   
   s.description      = <<-DESC
-  TODO: Add long description of the pod here.
+  This is an extension on UIViewController that facilitates managing a navigation bar contents (regardless if an UINavigationController is present or not) and allows defining a style for each UIViewController that will define the appearance of the bar and its content.
   DESC
   
   s.homepage         = 'https://github.com/sbrighiu/NavigationAndStyle'
@@ -34,6 +34,11 @@ Pod::Spec.new do |s|
   s.resource_bundle = {
     'Resources' => ['NavigationAndStyle/**/*.{lproj,storyboard,xcdatamodeld,xib,xcassets,json}']
   }
-  
-  # s.public_header_files = 'Pod/Classes/**/*.h'
 end
+
+# echo "5" > .swift-version
+# Check lint:   pod lib lint
+# add tag with version
+# push
+# pod trunk register smbcheeky@gmail.com
+# Push:         pod trunk push
