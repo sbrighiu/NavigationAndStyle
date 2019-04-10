@@ -85,7 +85,7 @@ extension UIViewController: NavigationVC, Identifiable {
         var shadowView: UIImageView?
         if self.navigationController == nil {
             if overrideModalSuperview != nil {
-                print("[Warning] Please remove the overrideModalSuperview value when an UINavigationController is present for your UIViewController, because it will not be used.")
+                logFrameworkWarning("Please remove the overrideModalSuperview value when an UINavigationController is present for your UIViewController, because it will not be used.")
             }
             (_, shadowView) = addOverlayNavigationBarElements(to: overrideModalSuperview ?? self.view)
         } else {
@@ -176,7 +176,7 @@ extension UIViewController: NavigationVC, Identifiable {
     
     @objc internal func pressedLeft(button: UIButton) {
         guard let type = button.getNavBarItemType() else {
-            print("Failed to get type for left button")
+            logFrameworkWarning("Failed to get type for left button")
             return
         }
         navBarItemPressed(with: type, button: button, isLeft: true)
@@ -184,7 +184,7 @@ extension UIViewController: NavigationVC, Identifiable {
     
     @objc internal func pressedRight(button: UIButton) {
         guard let type = button.getNavBarItemType() else {
-            print("Failed to get type for right button")
+            logFrameworkWarning("Failed to get type for right button")
             return
         }
         navBarItemPressed(with: type, button: button, isLeft: false)
@@ -192,7 +192,7 @@ extension UIViewController: NavigationVC, Identifiable {
     
     @objc internal func pressedSystemLeft(item: UIBarButtonItem) {
         guard let type = item.getNavBarItemType() else {
-            print("Failed to get type for left system button")
+            logFrameworkWarning("Failed to get type for left system button")
             return
         }
         navBarItemPressed(with: type, button: nil, isLeft: true)
@@ -200,7 +200,7 @@ extension UIViewController: NavigationVC, Identifiable {
     
     @objc internal func pressedSystemRight(item: UIBarButtonItem) {
         guard let type = item.getNavBarItemType() else {
-            print("Failed to get type for right system button")
+            logFrameworkWarning("Failed to get type for right system button")
             return
         }
         navBarItemPressed(with: type, button: nil, isLeft: false)
@@ -431,7 +431,7 @@ extension UIViewController {
     internal func refeshNavigationElementsAction(with navBar: UINavigationBar?, navItem: UINavigationItem?, duration: TimeInterval) {
         let navItem = getNavigationItem(overrideIfExists: navItem)
         guard let navBar = self.getNavigationBar(overrideIfExists: navBar) else {
-            print("Error! No navigation bar present to configure bar style for!")
+            logFrameworkError("No navigation bar present to configure bar style for!")
             return
         }
         
@@ -451,7 +451,7 @@ extension UIViewController {
     
     internal func updateBarStyle(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ViewControllerColorStyle) {
         guard let navBar = self.getNavigationBar(overrideIfExists: navBar) else {
-            print("Error! No navigation bar present to configure bar style for!")
+            logFrameworkError("No navigation bar present to configure bar style for!")
             return
         }
         navBar.barStyle = colorStyle.barStyle
@@ -465,7 +465,7 @@ extension UIViewController {
     
     internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ViewControllerColorStyle) {
         guard let navigationBar = self.getNavigationBar(overrideIfExists: navBar) else {
-            print("Error! No navigation bar present to configure bar style for!")
+            logFrameworkError("No navigation bar present to configure bar style for!")
             return
         }
         

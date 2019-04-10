@@ -46,6 +46,8 @@ extension UINavigationController: UINavigationControllerDelegate {
         
         if self.interactivePopGestureRecognizer?.numberOfTouches != 0 {
             popDoneWithTouch = true
+        } else {
+            viewController.refreshNavigationElements(with: nil, navItem: viewController.navigationItem, animated: true)
         }
     }
     
@@ -56,20 +58,19 @@ extension UINavigationController: UINavigationControllerDelegate {
         blockAnimations[uniqueIdentifier] = false
     }
     
-    open func navigationController(_ navigationController: UINavigationController,
-                                   animationControllerFor operation: UINavigationController.Operation,
-                                   from fromVC: UIViewController,
-                                   to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        toVC.refreshNavigationElements(with: nil, navItem: toVC.navigationItem, animated: true)
-        return getAnimatedTransitionManager(for: operation)
-    }
-    
-    open func getAnimatedTransitionManager(for operation: UINavigationController.Operation) -> UIViewControllerAnimatedTransitioning? {
-        return PushPopTransition(operation: operation, duration: defaultAnimationDuration)
-    }
+//    open func navigationController(_ navigationController: UINavigationController,
+//                                   animationControllerFor operation: UINavigationController.Operation,
+//                                   from fromVC: UIViewController,
+//                                   to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+//        return getAnimatedTransitionManager(for: operation)
+//    }
+//
+//    open func getAnimatedTransitionManager(for operation: UINavigationController.Operation) -> UIViewControllerAnimatedTransitioning? {
+//        return PushPopTransition(operation: operation, duration: defaultAnimationDuration)
+//    }
     
     internal func getAnimatedTransitionDuration() -> TimeInterval {
-        return getAnimatedTransitionManager(for: .push)?.transitionDuration(using: nil) ?? defaultAnimationDuration
+        return /* getAnimatedTransitionManager(for: .push)?.transitionDuration(using: nil) ?? */  defaultAnimationDuration
     }
     
     internal func getAnimatedElementsUpdateDuration() -> TimeInterval {
