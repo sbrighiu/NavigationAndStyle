@@ -6,11 +6,9 @@ import XCTest
 import UIKit
 
 class BaseTestCase: XCTestCase {
-    
     var rootVC: UIViewController!
     var rootNavVC: UIViewController!
     
-    // MARK: - Convenience
     func makeSUT(callback: SpyCallback? = nil, titleViewSpyCallback: TitleViewSpyCallback? = nil) {
         rootVC = UIWindow.makeContextWithVC(buttonCallback: callback, titleViewSpyCallback: titleViewSpyCallback)
     }

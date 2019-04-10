@@ -14,12 +14,6 @@ class SetupTests: BaseTestCase {
                                                                                         primary: .white,
                                                                                         secondary: .white,
                                                                                         underlineShadow: .red)
-        
-        // Put setup code here. This method is called before the in222vocation wof each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
     
     func test_setupNotCalled() {
@@ -40,7 +34,7 @@ class SetupTests: BaseTestCase {
         let (_, _, _, navBar, shadowView) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
         
         XCTAssert(navBar?.superview === scrollView)
-        XCTAssert(shadowView!.superview === scrollView) // This should always fail when using a UINavigationController
+        XCTAssert(shadowView!.superview === scrollView)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
@@ -65,7 +59,7 @@ class SetupTests: BaseTestCase {
         let scrollView = createAndAddScrollView(to: rootNavVC.view)
         let (_, _, _, _, shadowView) = rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
         
-        XCTAssert(shadowView!.superview !== scrollView) // This should always fail when using an UINavigationController
+        XCTAssert(shadowView!.superview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
     }
     

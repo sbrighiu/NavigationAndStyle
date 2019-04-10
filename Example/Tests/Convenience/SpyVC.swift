@@ -2,7 +2,6 @@
 //  Copyright © 2019 Stefan Brighiu. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import NavigationAndStyle
 

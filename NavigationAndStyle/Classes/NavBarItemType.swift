@@ -5,10 +5,6 @@
 import Foundation
 import UIKit
 
-protocol NavBarItem {
-    var type: NavBarItemType { get }
-}
-
 public class NavBarItemType: NSObject, Identifiable {
     let image: UIImage?
     let title: String?

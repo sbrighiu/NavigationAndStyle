@@ -75,19 +75,9 @@ class ViewController: UIViewController {
                     NavBarItemType.right.overlay
                 ])
             _ = change(titleToImageViewWithImage: UIImage.Placeholders.settings)
-            
-            //
-            //            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-            //                guard let view = self?.view else { return }
-            //                UIView.transition(with: view, duration: 0.3, options: [.transitionCrossDissolve], animations: {
-            //                    self?.change(leftNavBarItems: [NavBarItemType.left.extra], animated: false)
-            //                }, completion: nil)
-            //            }
         }
         
         numberOfVC += 1
-        
-        // Do any additional setup after loading the view, typically from a nib.
     }
     
     override func titleViewButtonPressed(with button: UIButton) {

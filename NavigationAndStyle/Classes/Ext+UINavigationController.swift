@@ -8,14 +8,6 @@ import UIKit
 private var blockAnimations = [Int: Bool]()
 private var defaultAnimationDuration: TimeInterval = defaultAnimationTime
 
-protocol NavigationVCBase {
-    var navigationController: UINavigationController? { get }
-    
-    func refreshNavigationElements(with navBar: UINavigationBar?, navItem: UINavigationItem?, animated: Bool)
-    func updateBarStyle(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ViewControllerColorStyle)
-    func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ViewControllerColorStyle)
-}
-
 private var popDoneWithTouch = false
 
 // MARK: - Handler Interactive slide-from-edge to back

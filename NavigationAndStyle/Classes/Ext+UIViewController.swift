@@ -5,6 +5,14 @@
 import Foundation
 import UIKit
 
+protocol NavigationVCBase {
+    var navigationController: UINavigationController? { get }
+    
+    func refreshNavigationElements(with navBar: UINavigationBar?, navItem: UINavigationItem?, animated: Bool)
+    func updateBarStyle(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ViewControllerColorStyle)
+    func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ViewControllerColorStyle)
+}
+
 protocol NavigationVC: NavigationVCBase {
     func set(title: String, left: [NavBarItemType], right: [NavBarItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?], UINavigationBar?, UIView?)
     
