@@ -5,13 +5,13 @@
 import Foundation
 import UIKit
 
-private var barButtonItemsDict = [Int: NavBarItemType]()
+private var barButtonItemsDict = [Int: UIBarButtonItemType]()
 
 extension UIButton: Identifiable {
-    internal static func build(with type: NavBarItemType,
+    internal static func build(with type: UIBarButtonItemType,
                                target: Any,
                                action: Selector,
-                               and colorStyle: ColorStyle?) -> UIButton {
+                               and colorStyle: ColorStyle) -> UIButton {
         let newButton = UIButton(type: .custom)
         newButton.frame = Constants.defaultFrame
         
@@ -23,37 +23,27 @@ extension UIButton: Identifiable {
         return newButton.configure(with: colorStyle)
     }
     
-    @discardableResult internal func configure(with colorStyle: ColorStyle?) -> UIButton {
+    @discardableResult internal func configure(with colorStyle: ColorStyle) -> UIButton {
         guard let type = getNavBarItemType() else { return self }
         
         if let image = type.image {
             self.setImage(image, for: .normal)
             self.imageView?.contentMode = .scaleAspectFit
             self.imageView?.clipsToBounds = true
-            
-            if let colorStyle = colorStyle {
-                self.imageView?.tintColor = colorStyle.imageTint
-            } else {
-                self.imageView?.tintColor = ColorStyle.Defaults.systemBarButtonItemTint
-            }
+            self.imageView?.tintColor = colorStyle.imageTint
         }
         self.contentEdgeInsets = type.contentEdgeInsets
+            
         self.setTitle(type.title ?? "", for: .normal)
+        self.titleLabel?.font = colorStyle.buttonFont
+        self.setTitleColor(colorStyle.buttonTitleColor, for: .normal)
+        self.setTitleColor(colorStyle.disabledColor, for: .disabled)
+        self.setTitleColor(colorStyle.highlightColor(for: colorStyle.buttonTitleColor), for: .highlighted)
         
-        if let colorStyle = colorStyle {
-            self.setTitleColor(colorStyle.buttonTitleColor, for: .normal)
-            self.setTitleColor(colorStyle.disabledColor, for: .disabled)
-            self.setTitleColor(colorStyle.buttonTitleColor.withAlphaComponent(ColorStyle.Defaults.alphaWhenTapped), for: .highlighted)
-            self.titleLabel?.font = colorStyle.buttonFont
-        } else {
-            self.setTitleColor(ColorStyle.Defaults.systemBarButtonItemTint, for: .normal)
-            self.setTitleColor(ColorStyle.Defaults.systemBarButtonItemTint, for: .disabled)
-            self.setTitleColor(ColorStyle.Defaults.systemBarButtonItemTint.withAlphaComponent(ColorStyle.Defaults.alphaWhenTapped), for: .highlighted)
-        }
         return self
     }
     
-    internal func getNavBarItemType() -> NavBarItemType? {
+    internal func getNavBarItemType() -> UIBarButtonItemType? {
         return barButtonItemsDict[uniqueIdentifier]
     }
 }

@@ -5,14 +5,14 @@
 import UIKit
 import NavigationAndStyle
 
-typealias SpyCallback = (NavBarItemType, UIButton?, Bool)->()
+typealias SpyCallback = (UIBarButtonItemType, UIButton?, Bool)->()
 typealias TitleViewSpyCallback = (UIButton)->()
 
 class SpyVC: UIViewController {
     var callback: SpyCallback?
     var titleViewSpyCallback: TitleViewSpyCallback?
     
-    override func navBarItemPressed(with type: NavBarItemType, button: UIButton?, isLeft: Bool) {
+    override func navBarItemPressed(with type: UIBarButtonItemType, button: UIButton?, isLeft: Bool) {
         callback?(type, button, isLeft)
     }
     

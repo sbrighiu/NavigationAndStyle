@@ -27,7 +27,10 @@ extension UIWindow {
     }
 }
 
-var anyText: String = "anyText"
-var otherText: String = "otherText"
-var anyImage: UIImage = UIImage()
+let anyText: String = "anyText"
+let otherText: String = "otherText"
+let anyImage: UIImage = UIImage()
+let anyBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: nil, action: nil)
+let anyView = UIView()
+let anyButton = UIButton()
 

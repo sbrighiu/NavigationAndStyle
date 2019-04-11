@@ -7,47 +7,39 @@ import UIKit
 
 open class ColorStyle: NSObject {
     
+    public static var global = ColorStyle()
+    
     public class Defaults {
-        private init() { }
-        
-        public static var globalStyle: ColorStyle?
+        public static var highlightAlpha: CGFloat = 0.66
+        public static func highlightColor(for color: UIColor, highlightAlpha: CGFloat = Defaults.highlightAlpha) -> UIColor {
+            return color.withAlphaComponent(highlightAlpha)
+        }
         
         public static var titleFont: UIFont = .boldSystemFont(ofSize: 17)
+        
         public static var buttonFont: UIFont = .boldSystemFont(ofSize: 17)
         
-        public static var alphaWhenTapped: CGFloat = 0.66
+        public static var disabledColor: UIColor = .lightGray
         
-        // This value masks the fact that UISearchBar does not support removing the background shadow before rendering
-        // (UISearchController), and by applying a white background and rounding the corners, we fix this issue and leave
-        // the search bar looking as clean/simple as possible. This value should be bigger than 8-12.
-        public static var cornerRadiusForSearchBarHotfix: CGFloat = 34/2
-        
-        public static var searchBarFont: UIFont = .systemFont(ofSize: 17)
-        public static var searchBarTextTint: UIColor = .black
-        public static var searchBarTextBackground: UIColor = .white
-        
-        public static let shadowAlpha: CGFloat = 0.25
-        
-        public static let disabledColor: UIColor = .lightGray
-        
-        public static var systemBarButtonItemTint: UIColor {
-            return systemBlue
+        public static var blueColor: UIColor {
+            return UIButton(frame: .zero).tintColor
         }
-        private static let systemBlue: UIColor = {
-            return UIButton(frame: .zero).tintColor ?? UIColor(red: 0, green: 0.477, blue: 1, alpha: 1)
-        }()
         
-        public static var systemNavigationBarTitleTextColor: UIColor {
-            return systemDarkTextColor
-        }
-        private static var systemDarkTextColor: UIColor {
+        public static var darkTextColor: UIColor {
             return .darkText
         }
         
-        public static var systemNavigationBarBackgroundImage: UIImage? = {
-            let navBar = UINavigationBar(frame: .zero)
-            return navBar.backgroundImage(for: .default)
-        }()
+        public static var navigationBarBackgroundColor: UIColor {
+            return UIColor(red: 0.97, green: 0.97, blue: 0.97, alpha: 1)
+        }
+        
+        public static var hairlineSeparatorColor: UIColor {
+            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 0.13)
+        }
+        
+        public static var heightOfHairlineSeparator: CGFloat {
+            return 1
+        }
     }
     
     public let statusBarStyle: UIStatusBarStyle
@@ -58,12 +50,12 @@ open class ColorStyle: NSObject {
     public let background: UIColor
     public let backgroundImage: UIImage?
     public let shadow: UIColor
-    public let shadowAlpha: CGFloat
+    public let hairlineSeparatorColor: UIColor
+    public let hairlineSeparatorHeight: CGFloat
     
     public let primary: UIColor
     public let secondary: UIColor
     public let third: UIColor
-    public let disabledColor: UIColor
     
     public let titleFont: UIFont
     public let titleColor: UIColor
@@ -71,57 +63,35 @@ open class ColorStyle: NSObject {
     public let buttonTitleColor: UIColor
     public let imageTint: UIColor?
     
-    required public init(statusBarStyle: UIStatusBarStyle,
-                         background: UIColor,
-                         backgroundImage: UIImage? = nil,
-                         shadow: UIColor = .clear,
-                         primary: UIColor,
-                         secondary: UIColor,
-                         third: UIColor,
-                         disabled: UIColor = Defaults.disabledColor) {
-        self.statusBarStyle = statusBarStyle
-        
-        self.background = background
-        self.backgroundImage = backgroundImage
-        self.shadow = shadow
-        self.shadowAlpha = Defaults.shadowAlpha
-        
-        self.primary = primary
-        self.secondary = secondary
-        self.third = third
-        self.disabledColor = disabled
-        
-        self.titleFont = Defaults.titleFont
-        self.titleColor = primary
-        self.buttonFont = Defaults.buttonFont
-        self.buttonTitleColor = secondary
-        self.imageTint = third
-        
-        super.init()
-    }
+    public let highlightAlpha: CGFloat
+    public let disabledColor: UIColor
     
-    public init(statusBarStyle: UIStatusBarStyle,
-                background: UIColor,
+    public init(statusBarStyle: UIStatusBarStyle = .default,
+                background: UIColor = Defaults.navigationBarBackgroundColor,
                 backgroundImage: UIImage? = nil,
                 shadow: UIColor = .clear,
-                shadowAlpha: CGFloat = Defaults.shadowAlpha,
+                hairlineSeparatorColor: UIColor = Defaults.hairlineSeparatorColor,
+                hairlineSeparatorHeight: CGFloat = Defaults.heightOfHairlineSeparator,
                 titleFont: UIFont = Defaults.titleFont,
-                titleColor: UIColor,
+                titleColor: UIColor = Defaults.darkTextColor,
                 buttonFont: UIFont = Defaults.buttonFont,
-                buttonTitleColor: UIColor,
-                imageTint: UIColor,
-                disabled: UIColor = Defaults.disabledColor) {
+                buttonTitleColor: UIColor = Defaults.blueColor,
+                imageTint: UIColor = Defaults.blueColor,
+                highlightAlpha: CGFloat = Defaults.highlightAlpha,
+                disabledColor: UIColor = Defaults.disabledColor) {
         self.statusBarStyle = statusBarStyle
         
         self.background = background
         self.backgroundImage = backgroundImage
         self.shadow = shadow
-        self.shadowAlpha = shadowAlpha
+        self.hairlineSeparatorColor = hairlineSeparatorColor
+        self.hairlineSeparatorHeight = hairlineSeparatorHeight
         
         self.primary = titleColor
         self.secondary = buttonTitleColor
         self.third = imageTint
-        self.disabledColor = disabled
+        self.highlightAlpha = highlightAlpha
+        self.disabledColor = disabledColor
         
         self.titleFont = titleFont
         self.titleColor = titleColor
@@ -132,8 +102,12 @@ open class ColorStyle: NSObject {
         super.init()
     }
     
-    public var titleAttr: [NSAttributedString.Key: Any] {
+    open var titleAttr: [NSAttributedString.Key: Any] {
         return [.foregroundColor: titleColor, .font: titleFont]
+    }
+    
+    open func highlightColor(for color: UIColor) -> UIColor {
+        return Defaults.highlightColor(for: color, highlightAlpha: highlightAlpha)
     }
     
 }

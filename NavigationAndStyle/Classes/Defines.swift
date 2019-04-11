@@ -7,9 +7,6 @@ import UIKit
 
 // MARK: - Constants
 internal struct Constants {
-    static var defaultAnimationTime = 0.3
-    static var defaultPopFinishedDelay = Constants.defaultAnimationTime + 0.05
-    
     static var defaultFrame: CGRect {
         return CGRect(x: 0, y: 0, width: minimumItemWidth, height: defaultItemHeight)
     }
@@ -35,7 +32,7 @@ internal struct Constants {
     }
 }
 
-// MARK: - Log Framework Convenience
+// MARK: - Log Framework errors and warnings
 internal func logFrameworkError(_ string: String, line: Int = #line, file: String = #file) {
     print("[NavigationAndStyle-Error {\(file):\(line)}] \(string) [Please check your view controller presentation/navigation code and, if necessary, open an issue on https://github.com/sbrighiu/NavigationAndStyle.git with more details]")
 }
@@ -47,9 +44,9 @@ internal func logFrameworkWarning(_ string: String, line: Int = #line, file: Str
 // MARK: - UIImage Examples
 public extension UIImage {
     struct NavigationAndStyle {
-        private static var bundle: Bundle {
+        private static var bundle: Bundle = {
             return Bundle(url: Bundle(identifier: "org.cocoapods.NavigationAndStyle")!.url(forResource: "Resources", withExtension: "bundle")!)!
-        }
+        }()
         public static var backArrow: UIImage! = {
             return UIImage(named: "backward_glyph", in: bundle, compatibleWith: nil)!.withRenderingMode(.alwaysTemplate)
         }()

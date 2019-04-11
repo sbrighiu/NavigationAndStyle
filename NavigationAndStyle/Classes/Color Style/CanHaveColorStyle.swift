@@ -6,14 +6,14 @@ import Foundation
 import UIKit
 
 @objc protocol CanHaveColorStyle {
-    func getColorStyle() -> ColorStyle?
+    func getColorStyle() -> ColorStyle
 }
 
 extension UIViewController: CanHaveColorStyle {
-    open func getColorStyle() -> ColorStyle? {
-        return ColorStyle.Defaults.globalStyle ??
-                splitViewController?.getColorStyle() ??
+    open func getColorStyle() -> ColorStyle {
+        return splitViewController?.getColorStyle() ??
                 tabBarController?.getColorStyle() ??
-                navigationController?.getColorStyle()
+                navigationController?.getColorStyle() ??
+        ColorStyle.global
     }
 }

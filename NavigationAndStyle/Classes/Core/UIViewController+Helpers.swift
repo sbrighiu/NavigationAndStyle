@@ -7,6 +7,7 @@ import UIKit
 
 private var modalNavigationBarDict = [Int: WEAK<UINavigationBar>]()
 private var maskStatusBarViewDict = [Int: WEAK<UIImageView>]()
+private var hairlineViewDict = [Int: WEAK<UIView>]()
 private var shadowOverlayViewDict = [Int: WEAK<UIImageView>]()
 
 extension UIViewController: Identifiable {
@@ -17,10 +18,6 @@ extension UIViewController: Identifiable {
     
     internal func getNavigationItem(overrideIfExists navItem: UINavigationItem? = nil) -> UINavigationItem {
         return navItem ?? self.navigationItem
-    }
-    
-    internal func getTitleSearchBar() -> UISearchBar? {
-        return self.navigationItem.titleView as? UISearchBar
     }
     
     internal func getMaskView() -> UIImageView? {
@@ -36,20 +33,20 @@ extension UIViewController {
         shadowOverlayViewDict[uniqueIdentifier] = nil
         maskStatusBarViewDict[uniqueIdentifier]?.item?.removeFromSuperview()
         maskStatusBarViewDict[uniqueIdentifier] = nil
+        hairlineViewDict[uniqueIdentifier]?.item?.removeFromSuperview()
+        hairlineViewDict[uniqueIdentifier] = nil
         modalNavigationBarDict[uniqueIdentifier]?.item?.removeFromSuperview()
         modalNavigationBarDict[uniqueIdentifier] = nil
     }
     
-    internal func addMaskViewIfNeeded(to superView: UIView) -> UIImageView {
+    internal func addMaskView(to superView: UIView) -> UIImageView {
+        let colorStyle = getColorStyle()
+        
         let maskView = UIImageView(frame: .zero)
         maskView.contentMode = .scaleAspectFill
         maskView.isUserInteractionEnabled = false
         
-        if let colorStyle = getColorStyle() {
-            maskView.backgroundColor = colorStyle.background
-        } else {
-            maskView.backgroundColor = .clear
-        }
+        maskView.backgroundColor = colorStyle.background
         
         maskStatusBarViewDict[uniqueIdentifier] = WEAK(with: maskView)
         
@@ -62,17 +59,41 @@ extension UIViewController {
             maskView.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
             ])
         
+        // Add hairline if needed
+        let hairlineSeparatorColor = getColorStyle().hairlineSeparatorColor
+        if hairlineSeparatorColor != .clear {
+            let hairlineView = UIView(frame: .zero)
+            hairlineView.contentMode = .scaleAspectFill
+            hairlineView.isUserInteractionEnabled = false
+            
+            hairlineView.backgroundColor = colorStyle.hairlineSeparatorColor
+            
+            hairlineViewDict[uniqueIdentifier] = WEAK(with: hairlineView)
+            
+            superView.insertSubview(hairlineView, aboveSubview: maskView)
+            hairlineView.translatesAutoresizingMaskIntoConstraints = false
+            
+            NSLayoutConstraint.activate([
+                hairlineView.topAnchor.constraint(equalTo: maskView.bottomAnchor),
+                hairlineView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
+                hairlineView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
+                hairlineView.heightAnchor.constraint(equalToConstant: colorStyle.hairlineSeparatorHeight)
+                ])
+        }
+        
         return maskView
     }
     
     internal func addShadowViewIfNeeded(to superView: UIView) -> UIImageView? {
-        guard let colorStyle = getColorStyle(), colorStyle.shadow != .clear else { return nil }
+        let colorStyle = getColorStyle()
+        
+        guard colorStyle.shadow != .clear else { return nil }
         
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
         imageView.contentMode = .scaleToFill
         imageView.image = UIImage.NavigationAndStyle.backgroundShadow
-        imageView.tintColor = colorStyle.shadow.withAlphaComponent(colorStyle.shadowAlpha)
+        imageView.tintColor = colorStyle.shadow
         imageView.isUserInteractionEnabled = false
         
         shadowOverlayViewDict[uniqueIdentifier] = WEAK(with: imageView)
@@ -92,7 +113,7 @@ extension UIViewController {
     internal func addNavigationBarComplementElements(of navC: UINavigationController) -> (UINavigationBar, UIImageView, UIImageView?) {
         removeOverlayNavigationBar()
         
-        let maskView = addMaskViewIfNeeded(to: self.view)
+        let maskView = addMaskView(to: self.view)
         maskView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         
         let shadowView = addShadowViewIfNeeded(to: self.view)
@@ -105,9 +126,9 @@ extension UIViewController {
         removeOverlayNavigationBar()
         
         // Setup base mask
-        let maskView = addMaskViewIfNeeded(to: superView)
+        let maskView = addMaskView(to: superView)
         
-        // Get shadowView if present
+        // Get shadowView if needed
         let shadowView = addShadowViewIfNeeded(to: superView)
         
         // Setup Navigation Bar
@@ -137,36 +158,6 @@ extension UIViewController {
 
 // MARK: - Manage titleView elements creation
 extension UIViewController {
-    // MARK: Manage UISearchBars
-    internal func addSearchBarInTitleView(with placeholder: String) -> UISearchBar {
-        let searchBar = getSearchBar(with: placeholder)
-        
-        getNavigationItem().titleView = searchBar
-        
-        searchBar.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
-        
-        return searchBar
-    }
-    
-    internal func getSearchBar(with placeholder: String) -> UISearchBar {
-        let searchBar = UISearchBar()
-        setup(searchBar: searchBar, with: placeholder)
-        return searchBar
-    }
-    
-    internal func setup(searchBar: UISearchBar, with placeholder: String) {
-        setAppearance(for: searchBar)
-        searchBar.placeholder = placeholder
-        searchBar.configure()
-    }
-    
-    internal func setAppearance(for searchBar: UISearchBar?) {
-        if let colorStyle = getColorStyle() {
-            searchBar?.setAppearance(with: colorStyle.buttonTitleColor, and: colorStyle.disabledColor)
-        } else {
-            searchBar?.setAppearance(with: ColorStyle.Defaults.systemBarButtonItemTint, and: ColorStyle.Defaults.disabledColor)
-        }
-    }
     
     // MARK: Manage UIImageViews
     internal func addImageView(with image: UIImage?) -> UIImageView {
@@ -177,6 +168,10 @@ extension UIViewController {
         
         imageView.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
         imageView.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.defaultItemWidth).isActive = true
+        
+        if let parent = imageView.superview {
+            imageView.centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+        }
         
         return imageView
     }
@@ -192,11 +187,7 @@ extension UIViewController {
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         
-        if let colorStyle = getColorStyle() {
-            imageView.tintColor = colorStyle.titleColor
-        } else {
-            imageView.tintColor = ColorStyle.Defaults.systemNavigationBarTitleTextColor
-        }
+        imageView.tintColor = getColorStyle().titleColor
     }
     
     // MARK: Manage UIButtons
@@ -209,11 +200,15 @@ extension UIViewController {
         button.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
         button.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.defaultItemWidth).isActive = true
         
+        if let parent = button.superview {
+            button.centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+        }
+        
         return button
     }
     
     internal func getButton(with text: String, and image: UIImage?) -> UIButton {
-        let button = UIButton(frame: Constants.defaultFrame)
+        let button = UIButton(frame: .zero)
         setup(button: button, with: text, and: image)
         
         return button
@@ -222,22 +217,16 @@ extension UIViewController {
     internal func setup(button: UIButton, with text: String, and image: UIImage?) {
         button.setTitle(text, for: .normal)
         
-        if let colorStyle = getColorStyle() {
-            button.titleLabel?.font = colorStyle.titleFont
-            button.setTitleColor(colorStyle.titleColor, for: .normal)
-            button.setTitleColor(colorStyle.titleColor.withAlphaComponent(ColorStyle.Defaults.alphaWhenTapped), for: .highlighted)
-            button.setTitleColor(colorStyle.disabledColor, for: .disabled)
-        } else {
-            button.titleLabel?.font = ColorStyle.Defaults.titleFont
-            button.setTitleColor(ColorStyle.Defaults.systemNavigationBarTitleTextColor, for: .normal)
-            button.setTitleColor(ColorStyle.Defaults.systemNavigationBarTitleTextColor.withAlphaComponent(ColorStyle.Defaults.alphaWhenTapped), for: .highlighted)
-            button.setTitleColor(ColorStyle.Defaults.systemNavigationBarTitleTextColor, for: .disabled)
-        }
+        let colorStyle = getColorStyle()
+        button.titleLabel?.font = colorStyle.titleFont
+        button.setTitleColor(colorStyle.titleColor, for: .normal)
+        button.setTitleColor(colorStyle.highlightColor(for: colorStyle.titleColor), for: .highlighted)
+        button.setTitleColor(colorStyle.disabledColor, for: .disabled)
         
-        if let imageView = button.imageView {
+        if let imageView = button.imageView, let image = image {
             setup(imageView: imageView)
             button.setImage(image, for: .normal)
-            button.adjustsImageWhenHighlighted = true // TODO: - Check insets if only title or only image
+            
             if !text.isEmpty {
                 button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -Constants.defaultButtonImagePadding/2, bottom: 0, right: Constants.defaultButtonImagePadding/2)
                 button.titleEdgeInsets = UIEdgeInsets(top: 0, left: Constants.defaultButtonImagePadding/2, bottom: 0, right: -Constants.defaultButtonImagePadding/2)
@@ -251,20 +240,35 @@ extension UIViewController {
     
     // MARK: Manage UILabels
     internal func addLabel(with text: String) -> UILabel {
-        let label = UILabel(frame: Constants.defaultFrame)
+        let label = getLabel(with: text)
+        
+        getNavigationItem().titleView = label
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        label.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
+        label.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.defaultItemWidth).isActive = true
+        
+        if let parent = label.superview {
+            label.centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+        }
+        
+        return label
+    }
+    
+    internal func getLabel(with text: String) -> UILabel {
+        let label = UILabel(frame: .zero)
         setup(label: label, with: text)
         
         return label
     }
     
-    func setup(label: UILabel, with text: String) {
+    internal func setup(label: UILabel, with text: String) {
+        let colorStyle = getColorStyle()
+        
         label.text = text
-        if let colorStyle = getColorStyle() {
-            label.textColor = colorStyle.titleColor
-            label.font = colorStyle.titleFont
-        } else {
-            label.font = ColorStyle.Defaults.titleFont
-            label.textColor = ColorStyle.Defaults.systemNavigationBarTitleTextColor
-        }
+        label.textAlignment = .center
+        label.textColor = colorStyle.titleColor
+        label.font = colorStyle.titleFont
     }
 }
