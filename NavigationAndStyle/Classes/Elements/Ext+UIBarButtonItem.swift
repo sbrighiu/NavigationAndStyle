@@ -22,6 +22,9 @@ extension UIBarButtonItem: Identifiable {
         if let systemItem = type.systemItem {
             newItem = UIBarButtonItem(barButtonSystemItem: systemItem, target: target, action: action)
             newItem.tintColor = colorStyle.buttonTitleColor
+            if let style = type.systemStyle {
+                newItem.style = style
+            }
             
         } else if let button = type.button {
             newButton = button

@@ -68,7 +68,7 @@ class ViewController: UIViewController {
                 
             } else if navC.viewControllers.count == 3 {
                 _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [UIBarButtonItemType.right.button(title: "Hello", target: self, selector: #selector(pressedCustomButton(button:)))])
-            
+                
             } else if navC.viewControllers.count == 4 {
                 let (item, view) = UIBarButtonItemType.right.customView
                 _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [item])
@@ -164,22 +164,12 @@ class ViewController: UIViewController {
                               imageTint: .black)
             
         } else if navigationController == nil {
-            if !numberOfVC.isMultiple(of: 2) {
-                self.view.backgroundColor = .white
-                return ColorStyle(statusBarStyle: .lightContent,
-                                  background: .red,
-                                  titleColor: .white,
-                                  buttonTitleColor: .white,
-                                  imageTint: .white)
-            } else {
-                self.view.backgroundColor = .black
-                return ColorStyle(statusBarStyle: .default,
-                                  background: .clear,
-                                  shadow: UIColor.white.withAlphaComponent(0.66),
-                                  titleColor: .black,
-                                  buttonTitleColor: .black,
-                                  imageTint: .black)
-            }
+            self.view.backgroundColor = .white
+            return ColorStyle(statusBarStyle: .lightContent,
+                              background: .red,
+                              titleColor: .white,
+                              buttonTitleColor: .white,
+                              imageTint: .white)
         }
         return ColorStyle(statusBarStyle: .lightContent,
                           background: .black,

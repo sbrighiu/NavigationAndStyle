@@ -9,6 +9,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
     public let title: String?
     public let image: UIImage?
     public let systemItem: UIBarButtonItem.SystemItem?
+    public let systemStyle: UIBarButtonItem.Style?
     public let button: UIButton?
     public let view: UIView?
     public let barButtonItem: UIBarButtonItem?
@@ -19,6 +20,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.title = title
         self.image = nil
         self.systemItem = nil
+        self.systemStyle = nil
         self.button = nil
         self.view = nil
         self.barButtonItem = nil
@@ -31,6 +33,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.title = title
         self.image = image
         self.systemItem = nil
+        self.systemStyle = nil
         self.button = nil
         self.view = nil
         self.barButtonItem = nil
@@ -43,6 +46,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.title = nil
         self.image = image
         self.systemItem = nil
+        self.systemStyle = nil
         self.button = nil
         self.view = nil
         self.barButtonItem = nil
@@ -51,10 +55,11 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         super.init()
     }
     
-    private init(systemItem: UIBarButtonItem.SystemItem, autoDismiss: Bool = false) {
+    private init(systemItem: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style, autoDismiss: Bool = false) {
         self.title = nil
         self.image = nil
         self.systemItem = systemItem
+        self.systemStyle = systemStyle
         self.button = nil
         self.view = nil
         self.barButtonItem = nil
@@ -67,6 +72,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.title = nil
         self.image = nil
         self.systemItem = nil
+        self.systemStyle = nil
         self.button = button
         self.view = nil
         self.barButtonItem = nil
@@ -79,6 +85,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.title = nil
         self.image = nil
         self.systemItem = nil
+        self.systemStyle = nil
         self.button = nil
         self.view = view
         self.barButtonItem = nil
@@ -91,6 +98,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.title = nil
         self.image = nil
         self.systemItem = nil
+        self.systemStyle = nil
         self.button = nil
         self.view = nil
         self.barButtonItem = barButtonItem
@@ -98,7 +106,7 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.contentEdgeInsets = .zero
         super.init()
     }
-
+    
     public static func title(_ title: String, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) -> UIBarButtonItemType {
         return UIBarButtonItemType(title: title, autoDismiss: autoDismiss, contentEdgeInsets: contentEdgeInsets)
     }
@@ -111,8 +119,8 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         return UIBarButtonItemType(image: image, autoDismiss: autoDismiss, contentEdgeInsets: contentEdgeInsets)
     }
     
-    public static func systemItem(_ type: UIBarButtonItem.SystemItem, autoDismiss: Bool = false) -> UIBarButtonItemType {
-        return UIBarButtonItemType(systemItem: type, autoDismiss: autoDismiss)
+    public static func systemItem(_ type: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style = .done, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(systemItem: type, systemStyle: systemStyle, autoDismiss: autoDismiss)
     }
     
     public static func button(_ button: UIButton, autoDismiss: Bool = false) -> UIBarButtonItemType {
