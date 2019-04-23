@@ -5,11 +5,11 @@
 import Foundation
 import UIKit
 
-private var models = [Int: UIViewControllerModel]()
+private var models = [Int: NavigationElementsModel]()
 
 extension UIViewController: Identifiable {
-    var model: UIViewControllerModel {
-        let value = models[uniqueIdentifier] ?? UIViewControllerModel()
+    var model: NavigationElementsModel {
+        let value = models[uniqueIdentifier] ?? NavigationElementsModel()
         models[uniqueIdentifier] = value
         return value
     }
@@ -33,7 +33,6 @@ extension UIViewController {
         model.backgroundView?.removeFromSuperview()
         model.hairlineSeparatorView?.removeFromSuperview()
         model.shadowBackgroundView?.removeFromSuperview()
-        model.clean()
     }
     
     internal func addMaskView(to superView: UIView) -> UIImageView {

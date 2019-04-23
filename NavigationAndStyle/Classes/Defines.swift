@@ -43,7 +43,7 @@ internal func logFrameworkWarning(_ string: String, line: Int = #line, file: Str
 
 // MARK: - UIImage Examples
 public extension UIImage {
-    struct NavigationAndStyle {
+    class NavigationAndStyle {
         private static var bundle: Bundle = {
             return Bundle(url: Bundle(identifier: "org.cocoapods.NavigationAndStyle")!.url(forResource: "Resources", withExtension: "bundle")!)!
         }()

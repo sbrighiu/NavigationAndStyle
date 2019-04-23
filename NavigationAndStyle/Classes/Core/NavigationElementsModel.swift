@@ -5,7 +5,7 @@
 import Foundation
 import UIKit
 
-public class UIViewControllerModel {
+public class NavigationElementsModel {
     public weak var modalNavigationBar: UINavigationBar?
     public weak var backgroundView: UIImageView?
     public weak var hairlineSeparatorView: UIView?
@@ -16,12 +16,5 @@ public class UIViewControllerModel {
             return backgroundView?.bottomAnchor
         }
         return hairlineSeparatorView?.bottomAnchor ?? backgroundView?.bottomAnchor
-    }
-    
-    func clean() {
-        modalNavigationBar = nil
-        backgroundView = nil
-        hairlineSeparatorView = nil
-        shadowBackgroundView = nil
     }
 }

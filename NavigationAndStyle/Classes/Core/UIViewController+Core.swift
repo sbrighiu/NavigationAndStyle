@@ -10,7 +10,7 @@ protocol NavigationVC {
     
     func triggerColorStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
     
-    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?], UIViewControllerModel)
+    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?], NavigationElementsModel)
     
     func change(titleToImageViewWith image: UIImage?) -> UIImageView
     func change(titleToButtonWith title: String, and image: UIImage?) -> UIButton
@@ -55,7 +55,7 @@ extension UIViewController: NavigationVC {
     @discardableResult public func set(title: String,
                                        left: [UIBarButtonItemType] = [],
                                        right: [UIBarButtonItemType] = [],
-                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?], UIViewControllerModel) {
+                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?], NavigationElementsModel) {
         if let navC = self.navigationController {
             if overrideModalSuperview != nil {
                 logFrameworkWarning("Please remove the overrideModalSuperview value when an UINavigationController is present for your UIViewController, because it will not be used.")
@@ -213,9 +213,6 @@ extension UIViewController {
         if let shadowView = model.shadowBackgroundView, shadowView.tintColor != colorStyle.shadow  {
             shadowView.tintColor = colorStyle.shadow
         }
-        
-        // Setup title attributes
-        navBar.titleTextAttributes = colorStyle.titleAttr
         
         // Update buttons
         let updateBarButtonItemsBlock: ((UIBarButtonItem)->()) = { item in

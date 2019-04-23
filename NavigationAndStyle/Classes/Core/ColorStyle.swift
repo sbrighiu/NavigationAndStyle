@@ -5,6 +5,19 @@
 import Foundation
 import UIKit
 
+@objc protocol CanHaveColorStyle {
+    func getColorStyle() -> ColorStyle
+}
+
+extension UIViewController: CanHaveColorStyle {
+    open func getColorStyle() -> ColorStyle {
+        return splitViewController?.getColorStyle() ??
+            tabBarController?.getColorStyle() ??
+            navigationController?.getColorStyle() ??
+            ColorStyle.global
+    }
+}
+
 open class ColorStyle: NSObject {
     
     public static var global = ColorStyle()
@@ -43,18 +56,11 @@ open class ColorStyle: NSObject {
     }
     
     public let statusBarStyle: UIStatusBarStyle
-    public var barStyle: UIBarStyle {
-        return statusBarStyle == .default ? .default : .black
-    }
     
     public let background: UIColor
     public let backgroundImage: UIImage?
     public let shadow: UIColor
     public let hairlineSeparatorColor: UIColor
-    
-    public let primary: UIColor
-    public let secondary: UIColor
-    public let third: UIColor
     
     public let titleFont: UIFont
     public let titleColor: UIColor
@@ -83,10 +89,7 @@ open class ColorStyle: NSObject {
         self.backgroundImage = backgroundImage
         self.shadow = shadow
         self.hairlineSeparatorColor = hairlineSeparatorColor
-        
-        self.primary = titleColor
-        self.secondary = buttonTitleColor
-        self.third = imageTint
+    
         self.highlightAlpha = highlightAlpha
         self.disabledColor = disabledColor
         
@@ -99,8 +102,21 @@ open class ColorStyle: NSObject {
         super.init()
     }
     
-    open var titleAttr: [NSAttributedString.Key: Any] {
-        return [.foregroundColor: titleColor, .font: titleFont]
+    // MARK: - Convenience methods
+    public var barStyle: UIBarStyle {
+        return statusBarStyle == .default ? .default : .black
+    }
+    
+    public var primaryColor: UIColor {
+        return titleColor
+    }
+    
+    public var secondaryColor: UIColor {
+        return buttonTitleColor
+    }
+    
+    public var thirdColor: UIColor {
+        return imageTint ?? secondaryColor
     }
     
     open func highlightColor(for color: UIColor) -> UIColor {
