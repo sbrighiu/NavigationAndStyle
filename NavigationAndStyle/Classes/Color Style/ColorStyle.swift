@@ -51,7 +51,6 @@ open class ColorStyle: NSObject {
     public let backgroundImage: UIImage?
     public let shadow: UIColor
     public let hairlineSeparatorColor: UIColor
-    public let hairlineSeparatorHeight: CGFloat
     
     public let primary: UIColor
     public let secondary: UIColor
@@ -71,7 +70,6 @@ open class ColorStyle: NSObject {
                 backgroundImage: UIImage? = nil,
                 shadow: UIColor = .clear,
                 hairlineSeparatorColor: UIColor = Defaults.hairlineSeparatorColor,
-                hairlineSeparatorHeight: CGFloat = Defaults.heightOfHairlineSeparator,
                 titleFont: UIFont = Defaults.titleFont,
                 titleColor: UIColor = Defaults.darkTextColor,
                 buttonFont: UIFont = Defaults.buttonFont,
@@ -85,7 +83,6 @@ open class ColorStyle: NSObject {
         self.backgroundImage = backgroundImage
         self.shadow = shadow
         self.hairlineSeparatorColor = hairlineSeparatorColor
-        self.hairlineSeparatorHeight = hairlineSeparatorHeight
         
         self.primary = titleColor
         self.secondary = buttonTitleColor

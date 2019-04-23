@@ -91,7 +91,7 @@ class ViewController: UIViewController {
             }
         } else {
             _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.close], right: [UIBarButtonItemType.right.dismiss])
-            _ = change(titleToImageViewWithImage: UIImage.NavigationAndStyle.settings)
+            _ = change(titleToImageViewWith: UIImage.NavigationAndStyle.settings)
         }
     }
     

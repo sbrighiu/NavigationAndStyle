@@ -82,35 +82,44 @@ class Tests: XCTestCase {
         makeSUT()
         
         let scrollView = createAndAddScrollView(to: rootVC.view)
-        let (_, _, _, navBar, _, shadowView) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
+        let (_, _, _, model) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
         
-        XCTAssert(navBar.superview === scrollView)
-        XCTAssert(shadowView!.superview === scrollView)
+        XCTAssert(model.modalNavigationBar!.superview === scrollView)
+        XCTAssert(model.shadowBackgroundView!.superview === scrollView)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
     func test_navVC() {
         makeNavSUT()
-        let (_, _, _, navBar, _, shadowView) = rootNavVC.set(title: anyText,
+        let (_, _, _, model) = rootNavVC.set(title: anyText,
                                                              left: [.image(UIImage.NavigationAndStyle.backArrow)],
                                                              right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
         
         let navC = rootNavVC.navigationController!
-        XCTAssert(navC.navigationBar === navBar)
-        XCTAssert(shadowView!.superview === rootNavVC.view)
+        XCTAssert(model.modalNavigationBar == nil)
+        XCTAssert(model.shadowBackgroundView!.superview === rootNavVC.view)
         XCTAssert(navC.delegate === (navC as UINavigationControllerDelegate))
         XCTAssert(navC.interactivePopGestureRecognizer!.delegate === (navC as UINavigationControllerDelegate))
         XCTAssert(navC.navigationBar.isTranslucent == true)
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
     }
     
+    func test_bottomAnchor_exists() {
+        makeNavSUT()
+        let (_, _, _, model) = rootNavVC.set(title: anyText,
+                                             left: [.image(UIImage.NavigationAndStyle.backArrow)],
+                                             right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
+        
+        XCTAssert(model.bottomAnchor != nil)
+    }
+    
     func test_navVC_customSuperview() {
         makeNavSUT()
         
         let scrollView = createAndAddScrollView(to: rootNavVC.view)
-        let (_, _, _, _, _, shadowView) = rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
+        let (_, _, _, model) = rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
         
-        XCTAssert(shadowView!.superview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
+        XCTAssert(model.shadowBackgroundView!.superview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
     }
     
@@ -170,7 +179,7 @@ class Tests: XCTestCase {
         
         XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
         
-        let imageView = rootVC.change(titleToImageViewWithImage: anyImage)
+        let imageView = rootVC.change(titleToImageViewWith: anyImage)
         
         let resultImageView = rootVC.navigationItem.titleView as! UIImageView
         XCTAssert(resultImageView === imageView)
@@ -187,7 +196,7 @@ class Tests: XCTestCase {
         
         XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
         
-        let button = rootVC.change(titleToButtonWithTitle: otherText, andImage: anyImage)
+        let button = rootVC.change(titleToButtonWith: otherText, and: anyImage)
         
         let resultButton = rootVC.navigationItem.titleView as! UIButton
         XCTAssert(resultButton === button)
@@ -268,7 +277,7 @@ class Tests: XCTestCase {
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons, _, _, _) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
+        let (_, leftButtons, rightButtons, _) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
         let buttonLeft1 = leftButtons.first!
         let buttonLeft2 = leftButtons.last!
         let buttonRight = rightButtons.first!
@@ -299,8 +308,8 @@ class Tests: XCTestCase {
         }
         makeSUT(titleViewSpyCallback: titleViewSpyCallback)
         
-        let (_, leftButtons, rightButtons, _, _, _) = rootVC.set(title: anyText)
-        let button = rootVC.change(titleToButtonWithTitle: anyText)
+        let (_, leftButtons, rightButtons, _) = rootVC.set(title: anyText)
+        let button = rootVC.change(titleToButtonWith: anyText)
         
         XCTAssert(leftButtons.count == 0)
         XCTAssert(rightButtons.count == 0)
@@ -326,12 +335,12 @@ class Tests: XCTestCase {
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons, navBar, _, _) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
+        let (_, leftButtons, rightButtons, model) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
         XCTAssert(leftButtons.first! == nil && leftButtons.last! == nil && leftButtons.count == 1)
         XCTAssert(rightButtons.first! == nil && rightButtons.last! == nil && leftButtons.count == 1)
         
-        let barItemLeft = navBar.items!.last!.leftBarButtonItem!
-        let barItemRight = navBar.items!.last!.rightBarButtonItem!
+        let barItemLeft = model.modalNavigationBar!.items!.last!.leftBarButtonItem!
+        let barItemRight = model.modalNavigationBar!.items!.last!.rightBarButtonItem!
         
         rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: barItemLeft)
         rootVC.perform(#selector(rootVC.pressedRight(item:)), with: barItemRight)
@@ -376,8 +385,8 @@ class Tests: XCTestCase {
         let vc = UIViewController()
         vc.set(title: anyText, right: [typeRight])
         
-        rootNavVC.navigationController?.pushViewController(vc, animated: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        rootNavVC.navigationController?.pushViewController(vc, animated: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             exp.fulfill()
             XCTAssert(vc.shouldAutomaticallyDismissFor(typeRight) == true)
         }
@@ -395,39 +404,27 @@ class Tests: XCTestCase {
         makeNavSUT()
         rootNavVC.set(title: otherText)
         
-        rootNavVC.navigationController?.present(vc, animated: true, completion: {
+        rootNavVC.navigationController?.present(vc, animated: false, completion: {
             exp.fulfill()
             
             XCTAssert((vc.navigationItem.titleView as! UILabel).text == anyText)
         })
         
-        waitForExpectations(timeout: 5.0, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
     
     func test_pushPresentTest() {
-        let exp = expectation(description: "waiting")
-        exp.expectedFulfillmentCount = 1
-        
         let vc = UIViewController()
         vc.set(title: anyText)
         
         makeNavSUT()
         rootNavVC.set(title: otherText)
         
-        rootNavVC.navigationController?.pushViewController(vc, animated: true)
+        rootNavVC.navigationController?.pushViewController(vc, animated: false)
         
-        var foundVC: UIViewController?
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: { [weak self] in
-            exp.fulfill()
-            
-            XCTAssert((vc.navigationItem.titleView as! UILabel).text == anyText)
-            
-            foundVC = self?.rootNavVC.navigationController?.topViewController
-        })
+        XCTAssert((vc.navigationItem.titleView as! UILabel).text == anyText)
         
-        waitForExpectations(timeout: 5.0, handler: nil)
-        
-        XCTAssert(foundVC === vc)
+        XCTAssert(self.rootNavVC.navigationController?.topViewController === vc)
     }
     
 }

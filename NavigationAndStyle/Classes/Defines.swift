@@ -64,11 +64,3 @@ public extension UIImage {
         }()
     }
 }
-
-// MARK: - WEAK container for global state retention of object references
-internal class WEAK<T: AnyObject> {
-    weak var item: T?
-    init(with item: T) {
-        self.item = item
-    }
-}

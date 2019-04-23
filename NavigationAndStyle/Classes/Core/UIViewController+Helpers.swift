@@ -5,50 +5,45 @@
 import Foundation
 import UIKit
 
-private var modalNavigationBarDict = [Int: WEAK<UINavigationBar>]()
-private var maskStatusBarViewDict = [Int: WEAK<UIImageView>]()
-private var hairlineViewDict = [Int: WEAK<UIView>]()
-private var shadowOverlayViewDict = [Int: WEAK<UIImageView>]()
+private var models = [Int: UIViewControllerModel]()
 
 extension UIViewController: Identifiable {
-    
+    var model: UIViewControllerModel {
+        let value = models[uniqueIdentifier] ?? UIViewControllerModel()
+        models[uniqueIdentifier] = value
+        return value
+    }
+}
+
+extension UIViewController {
     internal func getNavigationBar(overrideIfExists navBar: UINavigationBar? = nil) -> UINavigationBar? {
-        return navBar ?? modalNavigationBarDict[uniqueIdentifier]?.item ?? self.navigationController?.navigationBar
+        return navBar ?? model.modalNavigationBar ?? self.navigationController?.navigationBar
     }
     
     internal func getNavigationItem(overrideIfExists navItem: UINavigationItem? = nil) -> UINavigationItem {
         return navItem ?? self.navigationItem
-    }
-    
-    internal func getMaskView() -> UIImageView? {
-        return maskStatusBarViewDict[uniqueIdentifier]?.item
     }
 }
 
 extension UIViewController {
     
     // MARK: - Manager overlays outside an UINavigationController
-    internal func removeOverlayNavigationBar() {
-        shadowOverlayViewDict[uniqueIdentifier]?.item?.removeFromSuperview()
-        shadowOverlayViewDict[uniqueIdentifier] = nil
-        maskStatusBarViewDict[uniqueIdentifier]?.item?.removeFromSuperview()
-        maskStatusBarViewDict[uniqueIdentifier] = nil
-        hairlineViewDict[uniqueIdentifier]?.item?.removeFromSuperview()
-        hairlineViewDict[uniqueIdentifier] = nil
-        modalNavigationBarDict[uniqueIdentifier]?.item?.removeFromSuperview()
-        modalNavigationBarDict[uniqueIdentifier] = nil
+    internal func cleanUIAndModelBeforeSetup() {
+        model.modalNavigationBar?.removeFromSuperview()
+        model.backgroundView?.removeFromSuperview()
+        model.hairlineSeparatorView?.removeFromSuperview()
+        model.shadowBackgroundView?.removeFromSuperview()
+        model.clean()
     }
     
     internal func addMaskView(to superView: UIView) -> UIImageView {
-        let colorStyle = getColorStyle()
-        
         let maskView = UIImageView(frame: .zero)
         maskView.contentMode = .scaleAspectFill
         maskView.isUserInteractionEnabled = false
         
-        maskView.backgroundColor = colorStyle.background
+        maskView.backgroundColor = getColorStyle().background
         
-        maskStatusBarViewDict[uniqueIdentifier] = WEAK(with: maskView)
+        model.backgroundView = maskView
         
         superView.insertSubview(maskView, at: 0)
         maskView.translatesAutoresizingMaskIntoConstraints = false
@@ -59,85 +54,82 @@ extension UIViewController {
             maskView.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
             ])
         
-        // Add hairline if needed
-        let hairlineSeparatorColor = getColorStyle().hairlineSeparatorColor
-        if hairlineSeparatorColor != .clear {
-            let hairlineView = UIView(frame: .zero)
-            hairlineView.contentMode = .scaleAspectFill
-            hairlineView.isUserInteractionEnabled = false
-            
-            hairlineView.backgroundColor = colorStyle.hairlineSeparatorColor
-            
-            hairlineViewDict[uniqueIdentifier] = WEAK(with: hairlineView)
-            
-            superView.insertSubview(hairlineView, aboveSubview: maskView)
-            hairlineView.translatesAutoresizingMaskIntoConstraints = false
-            
-            NSLayoutConstraint.activate([
-                hairlineView.topAnchor.constraint(equalTo: maskView.bottomAnchor),
-                hairlineView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
-                hairlineView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
-                hairlineView.heightAnchor.constraint(equalToConstant: colorStyle.hairlineSeparatorHeight)
-                ])
-        }
+        addHairlineSeparator(superView, maskView)
         
         return maskView
     }
     
-    internal func addShadowViewIfNeeded(to superView: UIView) -> UIImageView? {
-        let colorStyle = getColorStyle()
+    internal func addHairlineSeparator(_ superView: UIView, _ maskView: UIImageView) {
+        let hairlineSeparatorColor = getColorStyle().hairlineSeparatorColor
         
-        guard colorStyle.shadow != .clear else { return nil }
+        let hairlineView = UIView(frame: .zero)
+        hairlineView.contentMode = .scaleAspectFill
+        hairlineView.isUserInteractionEnabled = false
         
-        let imageView = UIImageView()
-        imageView.backgroundColor = .clear
-        imageView.contentMode = .scaleToFill
-        imageView.image = UIImage.NavigationAndStyle.backgroundShadow
-        imageView.tintColor = colorStyle.shadow
-        imageView.isUserInteractionEnabled = false
+        hairlineView.backgroundColor = hairlineSeparatorColor
         
-        shadowOverlayViewDict[uniqueIdentifier] = WEAK(with: imageView)
+        model.hairlineSeparatorView = hairlineView
         
-        superView.insertSubview(imageView, at: 0)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        superView.insertSubview(hairlineView, aboveSubview: maskView)
+        hairlineView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: superView.topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
+            hairlineView.topAnchor.constraint(equalTo: maskView.bottomAnchor),
+            hairlineView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
+            hairlineView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
+            hairlineView.heightAnchor.constraint(equalToConstant: ColorStyle.Defaults.heightOfHairlineSeparator)
             ])
-        
-        return imageView
     }
     
-    internal func addNavigationBarComplementElements(of navC: UINavigationController) -> (UINavigationBar, UIImageView, UIImageView?) {
-        removeOverlayNavigationBar()
+    internal func addShadowView(to superView: UIView) -> UIImageView? {
+        let shadowView = UIImageView()
+        shadowView.backgroundColor = .clear
+        shadowView.contentMode = .scaleToFill
+        shadowView.image = UIImage.NavigationAndStyle.backgroundShadow
+        shadowView.tintColor = getColorStyle().shadow
+        shadowView.isUserInteractionEnabled = false
+        
+        model.shadowBackgroundView = shadowView
+        
+        superView.insertSubview(shadowView, at: 0)
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            shadowView.topAnchor.constraint(equalTo: superView.topAnchor),
+            shadowView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
+            shadowView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
+            ])
+        
+        return shadowView
+    }
+    
+    internal func addNavigationBarComplementElements(of navC: UINavigationController) {
+        cleanUIAndModelBeforeSetup()
         
         let maskView = addMaskView(to: self.view)
         maskView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         
-        let shadowView = addShadowViewIfNeeded(to: self.view)
+        let shadowView = addShadowView(to: self.view)
         shadowView?.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: Constants.shadowOverlayExtraHeight).isActive = true
-        
-        return (navC.navigationBar, maskView, shadowView)
     }
     
-    internal func addOverlayNavigationBarElements(to superView: UIView) -> (UINavigationBar, UIImageView, UIImageView?) {
-        removeOverlayNavigationBar()
+    internal func addOverlayNavigationBarElements(to superView: UIView) {
+        cleanUIAndModelBeforeSetup()
         
         // Setup base mask
         let maskView = addMaskView(to: superView)
         
         // Get shadowView if needed
-        let shadowView = addShadowViewIfNeeded(to: superView)
+        let shadowView = addShadowView(to: superView)
         
-        // Setup Navigation Bar
+        // Setup navigation Bar
         let navBar = UINavigationBar(frame: Constants.defaultFrame)
         navBar.items = [self.navigationItem]
         
         superView.insertSubview(navBar, aboveSubview: maskView)
         
-        modalNavigationBarDict[uniqueIdentifier] = WEAK(with: navBar)
+        model.modalNavigationBar = navBar
+        
         navBar.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -151,8 +143,6 @@ extension UIViewController {
         
         // Finish with the mask view
         maskView.bottomAnchor.constraint(equalTo: navBar.bottomAnchor).isActive = true
-        
-        return (navBar, maskView, shadowView)
     }
 }
 

@@ -10,10 +10,10 @@ protocol NavigationVC {
     
     func triggerColorStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
     
-    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?], UINavigationBar, UIImageView, UIImageView?)
+    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?], UIViewControllerModel)
     
-    func change(titleToImageViewWithImage image: UIImage?) -> UIImageView
-    func change(titleToButtonWithTitle title: String, andImage image: UIImage?) -> UIButton
+    func change(titleToImageViewWith image: UIImage?) -> UIImageView
+    func change(titleToButtonWith title: String, and image: UIImage?) -> UIButton
     func change(titleTo title: String) -> UILabel
     
     func change(leftNavBarItems items: [UIBarButtonItemType], animated: Bool) -> [UIButton?]
@@ -55,17 +55,14 @@ extension UIViewController: NavigationVC {
     @discardableResult public func set(title: String,
                                        left: [UIBarButtonItemType] = [],
                                        right: [UIBarButtonItemType] = [],
-                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?], UINavigationBar, UIImageView, UIImageView?) {
-        var shadowView: UIImageView?
-        let maskView: UIImageView
-        let navigationBar: UINavigationBar
+                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?], UIViewControllerModel) {
         if let navC = self.navigationController {
             if overrideModalSuperview != nil {
                 logFrameworkWarning("Please remove the overrideModalSuperview value when an UINavigationController is present for your UIViewController, because it will not be used.")
             }
-            (navigationBar, maskView, shadowView) = addNavigationBarComplementElements(of: navC)
+            addNavigationBarComplementElements(of: navC)
         } else {
-            (navigationBar, maskView, shadowView) = addOverlayNavigationBarElements(to: overrideModalSuperview ?? self.view)
+            addOverlayNavigationBarElements(to: overrideModalSuperview ?? self.view)
         }
         setupNavigationAndStyle()
         
@@ -73,16 +70,16 @@ extension UIViewController: NavigationVC {
         let leftButtonsGroup = change(leftNavBarItems: left)
         let rightButtonsGroup = change(rightNavBarItems: right)
         
-        return (titleLabel, leftButtonsGroup, rightButtonsGroup, navigationBar, maskView, shadowView)
+        return (titleLabel, leftButtonsGroup, rightButtonsGroup, model)
     }
     
     // MARK: - Handle changes in navigation bar items
-    @discardableResult public func change(titleToImageViewWithImage image: UIImage?) -> UIImageView {
+    @discardableResult public func change(titleToImageViewWith image: UIImage?) -> UIImageView {
         checkSetupStatus()
         return addImageView(with: image)
     }
     
-    @discardableResult public func change(titleToButtonWithTitle title: String, andImage image: UIImage? = nil) -> UIButton {
+    @discardableResult public func change(titleToButtonWith title: String, and image: UIImage? = nil) -> UIButton {
         checkSetupStatus()
         return addButton(with: title, and: image)
     }
@@ -200,16 +197,32 @@ extension UIViewController {
     
     internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ColorStyle) {
         // Setup background using the mask
-        getMaskView()?.backgroundColor = colorStyle.background
-        getMaskView()?.image = colorStyle.backgroundImage
+        if let maskView = model.backgroundView {
+            if maskView.backgroundColor != colorStyle.background {
+                maskView.backgroundColor = colorStyle.background
+            }
+            if maskView.image != colorStyle.backgroundImage {
+                maskView.image = colorStyle.backgroundImage
+            }
+        }
+        
+        if let hairlineView = model.hairlineSeparatorView, hairlineView.backgroundColor != colorStyle.hairlineSeparatorColor {
+            hairlineView.backgroundColor = colorStyle.hairlineSeparatorColor
+        }
+        
+        if let shadowView = model.shadowBackgroundView, shadowView.tintColor != colorStyle.shadow  {
+            shadowView.tintColor = colorStyle.shadow
+        }
         
         // Setup title attributes
         navBar.titleTextAttributes = colorStyle.titleAttr
         
         // Update buttons
         let updateBarButtonItemsBlock: ((UIBarButtonItem)->()) = { item in
-            if item.getNavBarItemType()?.barButtonItem != nil { return }
-            if item.getNavBarItemType()?.button != nil { return }
+            if let type = item.getNavBarItemType() {
+                if type.barButtonItem != nil { return }
+                if type.button != nil { return }
+            }
             item.tintColor = colorStyle.buttonTitleColor
             item.button?.configure(with: colorStyle)
         }
