@@ -6,15 +6,18 @@ import Foundation
 import UIKit
 
 protocol NavigationVC {
+    var navigationElements: NavigationElementsModel { get }
     var navigationController: UINavigationController? { get }
     
     func triggerColorStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
     
-    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?], NavigationElementsModel)
+    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?])
+    func set(titleButton title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UIButton, [UIButton?], [UIButton?])
+    func set(titleCustomView view: UIView, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UIView, [UIButton?], [UIButton?])
     
-    func change(titleToImageViewWith image: UIImage?) -> UIImageView
-    func change(titleToButtonWith title: String, and image: UIImage?) -> UIButton
     func change(titleTo title: String) -> UILabel
+    func change(titleToCustomView view: UIView) -> UIView
+    func change(titleToButtonWith title: String) -> UIButton
     
     func change(leftNavBarItems items: [UIBarButtonItemType], animated: Bool) -> [UIButton?]
     func change(rightNavBarItems items: [UIBarButtonItemType], animated: Bool) -> [UIButton?]
@@ -47,7 +50,7 @@ extension UIViewController: NavigationVC {
     
     func checkSetupStatus() {
         if !didSetupCustomNavigationAndStyle {
-            logFrameworkWarning("Always use .set(title:left:right:overrideModalSuperview:) to initialize navigation elements with the ColorStyle chosen.")
+            logFrameworkWarning("Always use .set(...) to initialize navigation elements with the ColorStyle chosen.")
         }
     }
     
@@ -55,7 +58,36 @@ extension UIViewController: NavigationVC {
     @discardableResult public func set(title: String,
                                        left: [UIBarButtonItemType] = [],
                                        right: [UIBarButtonItemType] = [],
-                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?], NavigationElementsModel) {
+                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?]) {
+        let (leftButtonsGroup, rightButtonsGroup) = set(left: left, right: right, overrideModalSuperview: overrideModalSuperview)
+        let titleLabel = change(titleTo: title)
+        
+        return (titleLabel, leftButtonsGroup, rightButtonsGroup)
+    }
+    
+    @discardableResult public func set(titleButton title: String,
+                                       left: [UIBarButtonItemType] = [],
+                                       right: [UIBarButtonItemType] = [],
+                                       overrideModalSuperview: UIView? = nil) -> (UIButton, [UIButton?], [UIButton?]) {
+        let (leftButtonsGroup, rightButtonsGroup) = set(left: left, right: right, overrideModalSuperview: overrideModalSuperview)
+        let titleButton = change(titleToButtonWith: title)
+        
+        return (titleButton, leftButtonsGroup, rightButtonsGroup)
+    }
+    
+    @discardableResult public func set(titleCustomView view: UIView,
+                                       left: [UIBarButtonItemType] = [],
+                                       right: [UIBarButtonItemType] = [],
+                                       overrideModalSuperview: UIView? = nil) -> (UIView, [UIButton?], [UIButton?]) {
+        let (leftButtonsGroup, rightButtonsGroup) = set(left: left, right: right, overrideModalSuperview: overrideModalSuperview)
+        let customView = change(titleToCustomView: view)
+        
+        return (customView, leftButtonsGroup, rightButtonsGroup)
+    }
+    
+    private func set(left: [UIBarButtonItemType] = [],
+                     right: [UIBarButtonItemType] = [],
+                     overrideModalSuperview: UIView? = nil) -> ([UIButton?], [UIButton?]) {
         if let navC = self.navigationController {
             if overrideModalSuperview != nil {
                 logFrameworkWarning("Please remove the overrideModalSuperview value when an UINavigationController is present for your UIViewController, because it will not be used.")
@@ -66,29 +98,29 @@ extension UIViewController: NavigationVC {
         }
         setupNavigationAndStyle()
         
-        let titleLabel = change(titleTo: title)
         let leftButtonsGroup = change(leftNavBarItems: left)
         let rightButtonsGroup = change(rightNavBarItems: right)
         
-        return (titleLabel, leftButtonsGroup, rightButtonsGroup, model)
+        return (leftButtonsGroup, rightButtonsGroup)
     }
     
-    // MARK: - Handle changes in navigation bar items
-    @discardableResult public func change(titleToImageViewWith image: UIImage?) -> UIImageView {
-        checkSetupStatus()
-        return addImageView(with: image)
-    }
-    
-    @discardableResult public func change(titleToButtonWith title: String, and image: UIImage? = nil) -> UIButton {
-        checkSetupStatus()
-        return addButton(with: title, and: image)
-    }
-    
+    // MARK: - Handle changes in titleView
     @discardableResult public func change(titleTo title: String) -> UILabel {
         checkSetupStatus()
         return addLabel(with: title)
     }
     
+    @discardableResult public func change(titleToCustomView view: UIView) -> UIView {
+        checkSetupStatus()
+        return addCustomView(with: view)
+    }
+    
+    @discardableResult public func change(titleToButtonWith title: String) -> UIButton {
+        checkSetupStatus()
+        return addButton(with: title)
+    }
+    
+    // MARK: - Handle changes in navigation bar items
     @discardableResult public func change(leftNavBarItems items: [UIBarButtonItemType], animated: Bool = true) -> [UIButton?] {
         checkSetupStatus()
         let (barItems, buttons) = get(navBarItems: items, isLeft: true)
@@ -147,7 +179,7 @@ extension UIViewController: NavigationVC {
     }
 }
 
-// MARK: - Handle button taps
+// MARK: - Handle taps
 extension UIViewController: CanHandleVCNavigationActions {
     open func titleViewButtonPressed(with button: UIButton) {
         assert(false, "Please implement titleViewButtonPressed(with:) in your UIViewController")
@@ -197,7 +229,7 @@ extension UIViewController {
     
     internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ColorStyle) {
         // Setup background using the mask
-        if let maskView = model.backgroundView {
+        if let maskView = navigationElements.backgroundImageView {
             if maskView.backgroundColor != colorStyle.background {
                 maskView.backgroundColor = colorStyle.background
             }
@@ -206,25 +238,25 @@ extension UIViewController {
             }
         }
         
-        if let hairlineView = model.hairlineSeparatorView, hairlineView.backgroundColor != colorStyle.hairlineSeparatorColor {
+        if let hairlineView = navigationElements.hairlineSeparatorView, hairlineView.backgroundColor != colorStyle.hairlineSeparatorColor {
             hairlineView.backgroundColor = colorStyle.hairlineSeparatorColor
         }
         
-        if let shadowView = model.shadowBackgroundView, shadowView.tintColor != colorStyle.shadow  {
+        if let shadowView = navigationElements.shadowBackgroundView, shadowView.tintColor != colorStyle.shadow  {
             shadowView.tintColor = colorStyle.shadow
         }
         
         // Update buttons
-        let updateBarButtonItemsBlock: ((UIBarButtonItem)->()) = { item in
+        let updateBarButtonItemsBlock: ((UIBarButtonItem, Bool)->()) = { item, isLeft in
             if let type = item.getNavBarItemType() {
                 if type.barButtonItem != nil { return }
                 if type.button != nil { return }
             }
             item.tintColor = colorStyle.buttonTitleColor
-            item.button?.configure(with: colorStyle)
+            item.button?.configure(with: colorStyle, isLeft: isLeft)
         }
         
-        navItem.leftBarButtonItems?.forEach(updateBarButtonItemsBlock)
-        navItem.rightBarButtonItems?.forEach(updateBarButtonItemsBlock)
+        navItem.leftBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, true) })
+        navItem.rightBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, false) })
     }
 }

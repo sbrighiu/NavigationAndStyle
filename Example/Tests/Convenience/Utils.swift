@@ -5,21 +5,21 @@
 import UIKit
 
 extension UIWindow {
-    static func makeContextWithVC(buttonCallback: SpyCallback?, titleViewSpyCallback: TitleViewSpyCallback?) -> SpyVC {
+    static func makeContextWithVC(buttonCallback: SpyCallback?, titleViewButtonSpyCallback: TitleViewButtonSpyCallback?) -> SpyVC {
         let window = UIWindow()
         let vc = SpyVC()
         vc.callback = buttonCallback
-        vc.titleViewSpyCallback = titleViewSpyCallback
+        vc.titleViewButtonSpyCallback = titleViewButtonSpyCallback
         window.rootViewController = vc
         window.makeKeyAndVisible()
         return vc
     }
     
-    static func makeContextWithNavC(buttonCallback: SpyCallback?, titleViewSpyCallback: TitleViewSpyCallback?) -> SpyVC {
+    static func makeContextWithNavC(buttonCallback: SpyCallback?, titleViewButtonSpyCallback: TitleViewButtonSpyCallback?) -> SpyVC {
         let window = UIWindow()
         let vc = SpyVC()
         vc.callback = buttonCallback
-        vc.titleViewSpyCallback = titleViewSpyCallback
+        vc.titleViewButtonSpyCallback = titleViewButtonSpyCallback
         let navC = UINavigationController(rootViewController: vc)
         window.rootViewController = navC
         window.makeKeyAndVisible()

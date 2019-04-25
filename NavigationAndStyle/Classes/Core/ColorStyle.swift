@@ -20,8 +20,105 @@ extension UIViewController: CanHaveColorStyle {
 
 open class ColorStyle: NSObject {
     
+    // MARK: - Convenience styles
     public static var global = ColorStyle()
     
+    public static var `default`: ColorStyle = {
+        return ColorStyle(statusBarStyle: .default,
+                          background: Defaults.navigationBarBackgroundColor,
+                          backgroundImage: nil,
+                          hairlineSeparatorColor: Defaults.hairlineSeparatorColor,
+                          shadow: .clear,
+                          titleFont: Defaults.titleFont,
+                          titleColor: Defaults.darkTextColor,
+                          buttonFont: Defaults.buttonFont,
+                          buttonTitleColor: Defaults.blueColor,
+                          imageTint: Defaults.blueColor,
+                          highlightAlpha: Defaults.highlightAlpha,
+                          disabledColor: Defaults.disabledColor)
+    }()
+    
+    public static func transparent(statusBarStyle: UIStatusBarStyle = .default,
+                                   shadow: UIColor = .clear,
+                                   titleFont: UIFont = Defaults.titleFont,
+                                   titleColor: UIColor = Defaults.darkTextColor,
+                                   buttonFont: UIFont = Defaults.buttonFont,
+                                   buttonTitleColor: UIColor = Defaults.blueColor,
+                                   imageTint: UIColor = Defaults.blueColor,
+                                   highlightAlpha: CGFloat = Defaults.highlightAlpha,
+                                   disabledColor: UIColor = Defaults.disabledColor) -> ColorStyle {
+        return ColorStyle(statusBarStyle: statusBarStyle,
+                          background: .clear,
+                          backgroundImage: nil,
+                          hairlineSeparatorColor: .clear,
+                          shadow: shadow,
+                          titleFont: titleFont,
+                          titleColor: titleColor,
+                          buttonFont: buttonFont,
+                          buttonTitleColor: buttonTitleColor,
+                          imageTint: imageTint,
+                          highlightAlpha: highlightAlpha,
+                          disabledColor: disabledColor)
+    }
+    
+    // MARK: - Implementation
+    public let statusBarStyle: UIStatusBarStyle
+    
+    public let background: UIColor
+    public let backgroundImage: UIImage?
+    public let hairlineSeparatorColor: UIColor
+    public let shadow: UIColor
+    
+    public let titleFont: UIFont
+    public let titleColor: UIColor
+    public let buttonFont: UIFont
+    public let buttonTitleColor: UIColor
+    public let imageTint: UIColor?
+    
+    public let highlightAlpha: CGFloat
+    public let disabledColor: UIColor
+    
+    public init(statusBarStyle: UIStatusBarStyle = .default,
+                background: UIColor = Defaults.navigationBarBackgroundColor,
+                backgroundImage: UIImage? = nil,
+                hairlineSeparatorColor: UIColor = .clear,
+                shadow: UIColor = .clear,
+                titleFont: UIFont = Defaults.titleFont,
+                titleColor: UIColor = Defaults.darkTextColor,
+                buttonFont: UIFont = Defaults.buttonFont,
+                buttonTitleColor: UIColor = Defaults.blueColor,
+                imageTint: UIColor = Defaults.blueColor,
+                highlightAlpha: CGFloat = Defaults.highlightAlpha,
+                disabledColor: UIColor = Defaults.disabledColor) {
+        self.statusBarStyle = statusBarStyle
+        
+        self.background = background
+        self.backgroundImage = backgroundImage
+        self.shadow = shadow
+        self.hairlineSeparatorColor = hairlineSeparatorColor
+    
+        self.highlightAlpha = highlightAlpha
+        self.disabledColor = disabledColor
+        
+        self.titleFont = titleFont
+        self.titleColor = titleColor
+        self.buttonFont = buttonFont
+        self.buttonTitleColor = buttonTitleColor
+        self.imageTint = imageTint
+        
+        super.init()
+    }
+    
+    // MARK: Convenience methods
+    public var barStyle: UIBarStyle {
+        return statusBarStyle == .default ? .default : .black
+    }
+    
+    open func highlightColor(for color: UIColor) -> UIColor {
+        return Defaults.highlightColor(for: color, highlightAlpha: highlightAlpha)
+    }
+    
+    // MARK: - Default values singleton for global style
     public class Defaults {
         public static var highlightAlpha: CGFloat = 0.66
         public static func highlightColor(for color: UIColor, highlightAlpha: CGFloat = Defaults.highlightAlpha) -> UIColor {
@@ -53,74 +150,6 @@ open class ColorStyle: NSObject {
         public static var heightOfHairlineSeparator: CGFloat {
             return 1
         }
-    }
-    
-    public let statusBarStyle: UIStatusBarStyle
-    
-    public let background: UIColor
-    public let backgroundImage: UIImage?
-    public let shadow: UIColor
-    public let hairlineSeparatorColor: UIColor
-    
-    public let titleFont: UIFont
-    public let titleColor: UIColor
-    public let buttonFont: UIFont
-    public let buttonTitleColor: UIColor
-    public let imageTint: UIColor?
-    
-    public let highlightAlpha: CGFloat
-    public let disabledColor: UIColor
-    
-    public init(statusBarStyle: UIStatusBarStyle = .default,
-                background: UIColor = Defaults.navigationBarBackgroundColor,
-                backgroundImage: UIImage? = nil,
-                shadow: UIColor = .clear,
-                hairlineSeparatorColor: UIColor = Defaults.hairlineSeparatorColor,
-                titleFont: UIFont = Defaults.titleFont,
-                titleColor: UIColor = Defaults.darkTextColor,
-                buttonFont: UIFont = Defaults.buttonFont,
-                buttonTitleColor: UIColor = Defaults.blueColor,
-                imageTint: UIColor = Defaults.blueColor,
-                highlightAlpha: CGFloat = Defaults.highlightAlpha,
-                disabledColor: UIColor = Defaults.disabledColor) {
-        self.statusBarStyle = statusBarStyle
-        
-        self.background = background
-        self.backgroundImage = backgroundImage
-        self.shadow = shadow
-        self.hairlineSeparatorColor = hairlineSeparatorColor
-    
-        self.highlightAlpha = highlightAlpha
-        self.disabledColor = disabledColor
-        
-        self.titleFont = titleFont
-        self.titleColor = titleColor
-        self.buttonFont = buttonFont
-        self.buttonTitleColor = buttonTitleColor
-        self.imageTint = imageTint
-        
-        super.init()
-    }
-    
-    // MARK: - Convenience methods
-    public var barStyle: UIBarStyle {
-        return statusBarStyle == .default ? .default : .black
-    }
-    
-    public var primaryColor: UIColor {
-        return titleColor
-    }
-    
-    public var secondaryColor: UIColor {
-        return buttonTitleColor
-    }
-    
-    public var thirdColor: UIColor {
-        return imageTint ?? secondaryColor
-    }
-    
-    open func highlightColor(for color: UIColor) -> UIColor {
-        return Defaults.highlightColor(for: color, highlightAlpha: highlightAlpha)
     }
     
 }

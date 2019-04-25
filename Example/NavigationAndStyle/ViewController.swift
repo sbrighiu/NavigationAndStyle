@@ -9,13 +9,13 @@ private extension UIBarButtonItemType {
     
     struct left {
         static let close: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.close, autoDismiss: true, contentEdgeInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 16))
+            return .image(UIImage.NavigationAndStyle.close, extendTapAreaBy: 16, autoDismiss: true)
         }()
         static let back: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: true, contentEdgeInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 16))
+            return .image(UIImage.NavigationAndStyle.backArrow, extendTapAreaBy: 16, autoDismiss: true)
         }()
-        static let settings: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.settings)
+        static let test: UIBarButtonItemType = {
+            return .title(NSLocalizedString("Test Test", comment: ""))
         }()
     }
     
@@ -39,9 +39,7 @@ private extension UIBarButtonItemType {
             return UIBarButtonItemType.button(button)
         }
         static var customView: (UIBarButtonItemType, UIView) = {
-            let view = UIView()
-            view.backgroundColor = .red
-            view.layer.cornerRadius = 11
+            let view = newView
             return (UIBarButtonItemType.view(view), view)
         }()
         static func rawBarItem(target: Any, selector: Selector) -> UIBarButtonItemType {
@@ -53,6 +51,13 @@ private extension UIBarButtonItemType {
     
 }
 
+private var newView: UIView {
+    let view = UIView()
+    view.backgroundColor = .red
+    view.layer.cornerRadius = 11
+    return view
+}
+
 var numberOfVC = 0
 
 class ViewController: UIViewController {
@@ -62,36 +67,48 @@ class ViewController: UIViewController {
         
         numberOfVC += 1
         
+        func setupExperiment() {
+            let button = UIButton()
+            button.setTitle("Experiment", for: .normal)
+            
+            let searchBar = UISearchBar(frame: .zero)
+            searchBar.placeholder = NSLocalizedString("Search something", comment: "")
+            
+            set(titleCustomView: searchBar, left: [UIBarButtonItemType.left.close], right: [UIBarButtonItemType.right.dismiss])
+            
+            //            change(titleToCustomView: searchBar)
+            //            self.navigationItem.titleView = view
+        }
+        
         if let navC = self.navigationController {
             if navC.viewControllers.count == 2 {
-                _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [UIBarButtonItemType.right.cancel])
+                set(titleButton: "Button", left: [UIBarButtonItemType.left.back], right: [UIBarButtonItemType.right.cancel])
                 
             } else if navC.viewControllers.count == 3 {
-                _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [UIBarButtonItemType.right.button(title: "Hello", target: self, selector: #selector(pressedCustomButton(button:)))])
+                set(title: "Label", left: [UIBarButtonItemType.left.back], right: [UIBarButtonItemType.right.button(title: "Hello", target: self, selector: #selector(pressedCustomButton(button:)))])
                 
             } else if navC.viewControllers.count == 4 {
                 let (item, view) = UIBarButtonItemType.right.customView
-                _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [item])
+                set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [item])
                 NSLayoutConstraint.activate([
                     view.heightAnchor.constraint(equalToConstant: 22),
                     view.widthAnchor.constraint(equalToConstant: 22)
                     ])
                 
             } else if navC.viewControllers.count > 4 {
-                _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.back], right: [UIBarButtonItemType.right.cancel])
+                setupExperiment()
                 
             } else if UIApplication.shared.delegate?.window??.rootViewController != self.navigationController {
-                _ = set(title: "\(numberOfVC)", right: [UIBarButtonItemType.right.dismiss, UIBarButtonItemType.right.temp])
+                set(titleButton: "Button", right: [UIBarButtonItemType.right.dismiss, UIBarButtonItemType.right.temp])
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                    _ = self?.change(rightNavBarItems: [UIBarButtonItemType.right.new, UIBarButtonItemType.right.dismiss])
+                    self?.change(rightNavBarItems: [UIBarButtonItemType.right.new, UIBarButtonItemType.right.dismiss])
                 }
             } else {
-                _ = set(title: "Test", left: [UIBarButtonItemType.left.settings], right: [UIBarButtonItemType.right.rawBarItem(target: self, selector: #selector(pressedCustomBarButtonItem(barButtonItem:)))])
+                set(titleButton: "Button", left: [UIBarButtonItemType.left.test], right: [UIBarButtonItemType.right.rawBarItem(target: self, selector: #selector(pressedCustomBarButtonItem(barButtonItem:)))])
             }
         } else {
-            _ = set(title: "\(numberOfVC)", left: [UIBarButtonItemType.left.close], right: [UIBarButtonItemType.right.dismiss])
-            _ = change(titleToImageViewWith: UIImage.NavigationAndStyle.settings)
+            setupExperiment()
         }
     }
     
@@ -142,40 +159,37 @@ class ViewController: UIViewController {
     }
     
     override func getColorStyle() -> ColorStyle {
-        if navigationController?.viewControllers.count == 1 {
-            self.view.backgroundColor = .white
-            return ColorStyle()
-            
-        } else if navigationController?.viewControllers.count == 2 {
-            self.view.backgroundColor = .white
-            return ColorStyle(statusBarStyle: .lightContent,
-                              background: .red,
-                              titleColor: .white,
-                              buttonTitleColor: .white,
-                              imageTint: .white)
-            
-        } else if navigationController?.viewControllers.count == 3 {
-            self.view.backgroundColor = .white
-            return ColorStyle(statusBarStyle: .default,
-                              background: .clear,
-                              shadow: UIColor.white.withAlphaComponent(0.66),
-                              titleColor: .black,
-                              buttonTitleColor: .black,
-                              imageTint: .black)
-            
-        } else if navigationController == nil {
-            self.view.backgroundColor = .white
-            return ColorStyle(statusBarStyle: .lightContent,
-                              background: .red,
-                              titleColor: .white,
-                              buttonTitleColor: .white,
-                              imageTint: .white)
+        if navigationController == nil {
+            self.view.backgroundColor = .black
+            return ColorStyle.transparent(statusBarStyle: .lightContent,
+                                          titleColor: .white,
+                                          buttonTitleColor: .white,
+                                          imageTint: .white)
+        } else {
+            if navigationController?.viewControllers.count == 2 {
+                return ColorStyle(statusBarStyle: .lightContent,
+                                  background: .red,
+                                  titleColor: .white,
+                                  buttonTitleColor: .white,
+                                  imageTint: .white)
+                
+            } else if navigationController?.viewControllers.count == 3 {
+                return ColorStyle.transparent(statusBarStyle: .default,
+                                              shadow: UIColor.black.withAlphaComponent(0.33),
+                                              titleColor: .white,
+                                              buttonTitleColor: .white,
+                                              imageTint: .white)
+                
+            } else if navigationController?.viewControllers.count == 4 {
+                return ColorStyle(statusBarStyle: .lightContent,
+                                  background: .black,
+                                  titleColor: .white,
+                                  buttonTitleColor: .white,
+                                  imageTint: .white)
+                
+            }
         }
-        return ColorStyle(statusBarStyle: .lightContent,
-                          background: .black,
-                          titleColor: .white,
-                          buttonTitleColor: .white,
-                          imageTint: .white)
+        return ColorStyle.default
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

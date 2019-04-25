@@ -14,9 +14,11 @@ public class UIBarButtonItemType: NSObject, Identifiable {
     public let view: UIView?
     public let barButtonItem: UIBarButtonItem?
     public let autoDismiss: Bool
-    internal let contentEdgeInsets: UIEdgeInsets
+    public let extendByValue: CGFloat
     
-    private init(title: String, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) {
+    private init(title: String,
+                 extendTapAreaBy extendByValue: CGFloat = 0,
+                 autoDismiss: Bool = false) {
         self.title = title
         self.image = nil
         self.systemItem = nil
@@ -25,11 +27,14 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = nil
         self.barButtonItem = nil
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = contentEdgeInsets
+        self.extendByValue = extendByValue
         super.init()
     }
     
-    private init(title: String, image: UIImage, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) {
+    private init(title: String,
+                 image: UIImage,
+                 extendTapAreaBy extendByValue: CGFloat = 0,
+                 autoDismiss: Bool = false) {
         self.title = title
         self.image = image
         self.systemItem = nil
@@ -38,11 +43,13 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = nil
         self.barButtonItem = nil
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = contentEdgeInsets
+        self.extendByValue = extendByValue
         super.init()
     }
     
-    private init(image: UIImage, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) {
+    private init(image: UIImage,
+                 extendTapAreaBy extendByValue: CGFloat = 0,
+                 autoDismiss: Bool = false) {
         self.title = nil
         self.image = image
         self.systemItem = nil
@@ -51,11 +58,13 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = nil
         self.barButtonItem = nil
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = contentEdgeInsets
+        self.extendByValue = extendByValue
         super.init()
     }
     
-    private init(systemItem: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style, autoDismiss: Bool = false) {
+    private init(systemItem: UIBarButtonItem.SystemItem,
+                 systemStyle: UIBarButtonItem.Style,
+                 autoDismiss: Bool = false) {
         self.title = nil
         self.image = nil
         self.systemItem = systemItem
@@ -64,11 +73,12 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = nil
         self.barButtonItem = nil
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = .zero
+        self.extendByValue = 0
         super.init()
     }
     
-    private init(button: UIButton, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) {
+    private init(button: UIButton,
+                 autoDismiss: Bool = false) {
         self.title = nil
         self.image = nil
         self.systemItem = nil
@@ -77,11 +87,12 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = nil
         self.barButtonItem = nil
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = .zero
+        self.extendByValue = 0
         super.init()
     }
     
-    private init(view: UIView, autoDismiss: Bool = false) {
+    private init(view: UIView,
+                 autoDismiss: Bool = false) {
         self.title = nil
         self.image = nil
         self.systemItem = nil
@@ -90,11 +101,12 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = view
         self.barButtonItem = nil
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = .zero
+        self.extendByValue = 0
         super.init()
     }
     
-    private init(barButtonItem: UIBarButtonItem, autoDismiss: Bool = false) {
+    private init(barButtonItem: UIBarButtonItem,
+                 autoDismiss: Bool = false) {
         self.title = nil
         self.image = nil
         self.systemItem = nil
@@ -103,20 +115,21 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         self.view = nil
         self.barButtonItem = barButtonItem
         self.autoDismiss = autoDismiss
-        self.contentEdgeInsets = .zero
+        self.extendByValue = 0
         super.init()
     }
     
-    public static func title(_ title: String, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) -> UIBarButtonItemType {
-        return UIBarButtonItemType(title: title, autoDismiss: autoDismiss, contentEdgeInsets: contentEdgeInsets)
+    // MARK: - Factory methods
+    public static func title(_ title: String, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(title: title, extendTapAreaBy: extendTapAreaBy, autoDismiss: autoDismiss)
     }
     
-    public static func titleAndImage(_ title: String, image: UIImage, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) -> UIBarButtonItemType {
-        return UIBarButtonItemType(title: title, image: image, autoDismiss: autoDismiss, contentEdgeInsets: contentEdgeInsets)
+    public static func titleAndImage(_ title: String, image: UIImage, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(title: title, image: image, extendTapAreaBy: extendTapAreaBy, autoDismiss: autoDismiss)
     }
     
-    public static func image(_ image: UIImage, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) -> UIBarButtonItemType {
-        return UIBarButtonItemType(image: image, autoDismiss: autoDismiss, contentEdgeInsets: contentEdgeInsets)
+    public static func image(_ image: UIImage, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(image: image, extendTapAreaBy: extendTapAreaBy, autoDismiss: autoDismiss)
     }
     
     public static func systemItem(_ type: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style = .done, autoDismiss: Bool = false) -> UIBarButtonItemType {
@@ -127,11 +140,23 @@ public class UIBarButtonItemType: NSObject, Identifiable {
         return UIBarButtonItemType(button: button, autoDismiss: autoDismiss)
     }
     
-    public static func view(_ view: UIView, autoDismiss: Bool = false, contentEdgeInsets: UIEdgeInsets = .zero) -> UIBarButtonItemType {
+    public static func view(_ view: UIView, autoDismiss: Bool = false) -> UIBarButtonItemType {
         return UIBarButtonItemType(view: view, autoDismiss: autoDismiss)
     }
     
     public static func raw(_ barButtonItem: UIBarButtonItem, autoDismiss: Bool = false) -> UIBarButtonItemType {
         return UIBarButtonItemType(barButtonItem: barButtonItem, autoDismiss: autoDismiss)
+    }
+    
+    // MARK: - Internal Convenience methods
+    func contentInsets(forLeftElement isLeft: Bool) -> UIEdgeInsets {
+        if extendByValue != 0 {
+            if isLeft {
+                return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: extendByValue)
+            } else {
+                return UIEdgeInsets(top: 0, left: extendByValue, bottom: 0, right: 0)
+            }
+        }
+        return .zero
     }
 }

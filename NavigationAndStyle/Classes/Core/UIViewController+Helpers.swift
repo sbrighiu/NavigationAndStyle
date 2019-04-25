@@ -5,19 +5,9 @@
 import Foundation
 import UIKit
 
-private var models = [Int: NavigationElementsModel]()
-
-extension UIViewController: Identifiable {
-    var model: NavigationElementsModel {
-        let value = models[uniqueIdentifier] ?? NavigationElementsModel()
-        models[uniqueIdentifier] = value
-        return value
-    }
-}
-
 extension UIViewController {
     internal func getNavigationBar(overrideIfExists navBar: UINavigationBar? = nil) -> UINavigationBar? {
-        return navBar ?? model.modalNavigationBar ?? self.navigationController?.navigationBar
+        return navBar ?? navigationElements.modalNavigationBar ?? self.navigationController?.navigationBar
     }
     
     internal func getNavigationItem(overrideIfExists navItem: UINavigationItem? = nil) -> UINavigationItem {
@@ -27,22 +17,16 @@ extension UIViewController {
 
 extension UIViewController {
     
-    // MARK: - Manager overlays outside an UINavigationController
-    internal func cleanUIAndModelBeforeSetup() {
-        model.modalNavigationBar?.removeFromSuperview()
-        model.backgroundView?.removeFromSuperview()
-        model.hairlineSeparatorView?.removeFromSuperview()
-        model.shadowBackgroundView?.removeFromSuperview()
-    }
-    
     internal func addMaskView(to superView: UIView) -> UIImageView {
+        let colorStyle = getColorStyle()
+        
         let maskView = UIImageView(frame: .zero)
+        maskView.backgroundColor = colorStyle.background
         maskView.contentMode = .scaleAspectFill
+        maskView.image = colorStyle.backgroundImage
         maskView.isUserInteractionEnabled = false
         
-        maskView.backgroundColor = getColorStyle().background
-        
-        model.backgroundView = maskView
+        navigationElements.backgroundImageView = maskView
         
         superView.insertSubview(maskView, at: 0)
         maskView.translatesAutoresizingMaskIntoConstraints = false
@@ -67,7 +51,7 @@ extension UIViewController {
         
         hairlineView.backgroundColor = hairlineSeparatorColor
         
-        model.hairlineSeparatorView = hairlineView
+        navigationElements.hairlineSeparatorView = hairlineView
         
         superView.insertSubview(hairlineView, aboveSubview: maskView)
         hairlineView.translatesAutoresizingMaskIntoConstraints = false
@@ -88,7 +72,7 @@ extension UIViewController {
         shadowView.tintColor = getColorStyle().shadow
         shadowView.isUserInteractionEnabled = false
         
-        model.shadowBackgroundView = shadowView
+        navigationElements.shadowBackgroundView = shadowView
         
         superView.insertSubview(shadowView, at: 0)
         shadowView.translatesAutoresizingMaskIntoConstraints = false
@@ -103,17 +87,17 @@ extension UIViewController {
     }
     
     internal func addNavigationBarComplementElements(of navC: UINavigationController) {
-        cleanUIAndModelBeforeSetup()
+        navigationElements.removeFromSuperview()
         
         let maskView = addMaskView(to: self.view)
         maskView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         
         let shadowView = addShadowView(to: self.view)
-        shadowView?.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: Constants.shadowOverlayExtraHeight).isActive = true
+        shadowView?.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: Constants.recommendedItemHeight).isActive = true
     }
     
     internal func addOverlayNavigationBarElements(to superView: UIView) {
-        cleanUIAndModelBeforeSetup()
+        navigationElements.removeFromSuperview()
         
         // Setup base mask
         let maskView = addMaskView(to: superView)
@@ -122,23 +106,23 @@ extension UIViewController {
         let shadowView = addShadowView(to: superView)
         
         // Setup navigation Bar
-        let navBar = UINavigationBar(frame: Constants.defaultFrame)
+        let navBar = UINavigationBar()
         navBar.items = [self.navigationItem]
         
         superView.insertSubview(navBar, aboveSubview: maskView)
         
-        model.modalNavigationBar = navBar
+        navigationElements.modalNavigationBar = navBar
         
         navBar.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             navBar.topAnchor.constraint(equalTo: superView.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
-            navBar.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
+            navBar.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
             ])
         
         // Finish with the shadow view
-        shadowView?.bottomAnchor.constraint(equalTo: navBar.bottomAnchor, constant: Constants.shadowOverlayExtraHeight).isActive = true
+        shadowView?.bottomAnchor.constraint(equalTo: navBar.bottomAnchor, constant: Constants.shadowExtraHeight).isActive = true
         
         // Finish with the mask view
         maskView.bottomAnchor.constraint(equalTo: navBar.bottomAnchor).isActive = true
@@ -148,79 +132,36 @@ extension UIViewController {
 // MARK: - Manage titleView elements creation
 extension UIViewController {
     
-    // MARK: Manage UIImageViews
-    internal func addImageView(with image: UIImage?) -> UIImageView {
-        let imageView = getImageView(with: image)
-        getNavigationItem().titleView = imageView
+    internal func addCustomView(with view: UIView) -> UIView {
+        view.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.recommendedItemHeight).isActive = true
+        view.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.recommendedItemHeight).isActive = true
         
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        imageView.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
-        imageView.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.defaultItemWidth).isActive = true
-        
-        if let parent = imageView.superview {
-            imageView.centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
-        }
-        
-        return imageView
+        getNavigationItem().titleView = view
+        return view
     }
-    
-    internal func getImageView(with image: UIImage?) -> UIImageView {
-        let imageView = UIImageView(image: image)
-        setup(imageView: imageView)
         
-        return imageView
-    }
-    
-    internal func setup(imageView: UIImageView) {
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        
-        imageView.tintColor = getColorStyle().titleColor
+    internal func setup(view: UIView) {
+        view.backgroundColor = .clear
     }
     
     // MARK: Manage UIButtons
-    internal func addButton(with text: String, and image: UIImage?) -> UIButton {
-        let button = getButton(with: text, and: image)
+    internal func addButton(with text: String) -> UIButton {
+        let button = UIButton(type: .custom)
+        setup(button: button, with: text)
+        
         getNavigationItem().titleView = button
-        
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        button.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
-        button.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.defaultItemWidth).isActive = true
-        
-        if let parent = button.superview {
-            button.centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
-        }
-        
         return button
     }
     
-    internal func getButton(with text: String, and image: UIImage?) -> UIButton {
-        let button = UIButton(frame: .zero)
-        setup(button: button, with: text, and: image)
-        
-        return button
-    }
-    
-    internal func setup(button: UIButton, with text: String, and image: UIImage?) {
+    internal func setup(button: UIButton, with text: String) {
         button.setTitle(text, for: .normal)
         
         let colorStyle = getColorStyle()
         button.titleLabel?.font = colorStyle.titleFont
+        button.tintColor = colorStyle.titleColor
         button.setTitleColor(colorStyle.titleColor, for: .normal)
         button.setTitleColor(colorStyle.highlightColor(for: colorStyle.titleColor), for: .highlighted)
         button.setTitleColor(colorStyle.disabledColor, for: .disabled)
-        
-        if let imageView = button.imageView, let image = image {
-            setup(imageView: imageView)
-            button.setImage(image, for: .normal)
-            
-            if !text.isEmpty {
-                button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -Constants.defaultButtonImagePadding/2, bottom: 0, right: Constants.defaultButtonImagePadding/2)
-                button.titleEdgeInsets = UIEdgeInsets(top: 0, left: Constants.defaultButtonImagePadding/2, bottom: 0, right: -Constants.defaultButtonImagePadding/2)
-            }
-        }
         
         button.addTarget(self,
                          action: #selector(titleViewButtonPressed(with:)),
@@ -229,26 +170,10 @@ extension UIViewController {
     
     // MARK: Manage UILabels
     internal func addLabel(with text: String) -> UILabel {
-        let label = getLabel(with: text)
-        
-        getNavigationItem().titleView = label
-        
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        label.heightAnchor.constraint(equalToConstant: Constants.defaultItemHeight).isActive = true
-        label.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.defaultItemWidth).isActive = true
-        
-        if let parent = label.superview {
-            label.centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
-        }
-        
-        return label
-    }
-    
-    internal func getLabel(with text: String) -> UILabel {
         let label = UILabel(frame: .zero)
         setup(label: label, with: text)
         
+        getNavigationItem().titleView = label
         return label
     }
     
@@ -259,5 +184,41 @@ extension UIViewController {
         label.textAlignment = .center
         label.textColor = colorStyle.titleColor
         label.font = colorStyle.titleFont
+    }
+}
+
+// MARK: - NavigationElementsModel management
+private var models = [Int: NavigationElementsModel]()
+
+public class NavigationElementsModel {
+    public weak var modalNavigationBar: UINavigationBar?
+    public weak var backgroundImageView: UIImageView?
+    public weak var hairlineSeparatorView: UIView?
+    public weak var shadowBackgroundView: UIImageView?
+    
+    public var customSuperview: UIView? {
+        return modalNavigationBar?.superview
+    }
+    
+    public var bottomAnchor: NSLayoutYAxisAnchor? {
+        if hairlineSeparatorView?.backgroundColor == .clear {
+            return backgroundImageView?.bottomAnchor
+        }
+        return hairlineSeparatorView?.bottomAnchor ?? backgroundImageView?.bottomAnchor
+    }
+    
+    func removeFromSuperview() {
+        modalNavigationBar?.removeFromSuperview()
+        backgroundImageView?.removeFromSuperview()
+        hairlineSeparatorView?.removeFromSuperview()
+        shadowBackgroundView?.removeFromSuperview()
+    }
+}
+
+extension UIViewController: Identifiable {
+    public var navigationElements: NavigationElementsModel {
+        let value = models[uniqueIdentifier] ?? NavigationElementsModel()
+        models[uniqueIdentifier] = value
+        return value
     }
 }

@@ -11,12 +11,12 @@ class Tests: XCTestCase {
     var rootVC: UIViewController!
     var rootNavVC: UIViewController!
     
-    func makeSUT(callback: SpyCallback? = nil, titleViewSpyCallback: TitleViewSpyCallback? = nil) {
-        rootVC = UIWindow.makeContextWithVC(buttonCallback: callback, titleViewSpyCallback: titleViewSpyCallback)
+    func makeSUT(callback: SpyCallback? = nil, titleViewSpyCallback: TitleViewButtonSpyCallback? = nil) {
+        rootVC = UIWindow.makeContextWithVC(buttonCallback: callback, titleViewButtonSpyCallback: titleViewSpyCallback)
     }
     
-    func makeNavSUT(callback: SpyCallback? = nil, titleViewSpyCallback: TitleViewSpyCallback? = nil) {
-        rootNavVC = UIWindow.makeContextWithNavC(buttonCallback: callback, titleViewSpyCallback: titleViewSpyCallback)
+    func makeNavSUT(callback: SpyCallback? = nil, titleViewSpyCallback: TitleViewButtonSpyCallback? = nil) {
+        rootNavVC = UIWindow.makeContextWithNavC(buttonCallback: callback, titleViewButtonSpyCallback: titleViewSpyCallback)
     }
     
     func createAndAddScrollView(to superView: UIView) -> UIScrollView {
@@ -46,19 +46,22 @@ class Tests: XCTestCase {
     
     // MARK: - Test setup
     func test_setupNotCalled() {
+        ColorStyle.global = ColorStyle.transparent()
+        
         makeSUT()
         XCTAssertFalse(rootVC.didSetupCustomNavigationAndStyle)
     }
     
-    func test_setupWithEmptyStyle() {
+    func test_setup() {
         ColorStyle.global = ColorStyle()
+        
         makeSUT()
         rootVC.set(title: anyText)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
     func test_setupWithTitle() {
-        ColorStyle.global = ColorStyle()
+        ColorStyle.global = ColorStyle.default
         
         makeSUT()
         rootVC.set(title: anyText)
@@ -82,22 +85,23 @@ class Tests: XCTestCase {
         makeSUT()
         
         let scrollView = createAndAddScrollView(to: rootVC.view)
-        let (_, _, _, model) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
+        let (_, _, _) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
         
-        XCTAssert(model.modalNavigationBar!.superview === scrollView)
-        XCTAssert(model.shadowBackgroundView!.superview === scrollView)
+        XCTAssert(rootVC.navigationElements.customSuperview === scrollView)
+        XCTAssert(rootVC.navigationElements.shadowBackgroundView!.superview === scrollView)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
     func test_navVC() {
         makeNavSUT()
-        let (_, _, _, model) = rootNavVC.set(title: anyText,
+        let (_, _, _) = rootNavVC.set(title: anyText,
                                                              left: [.image(UIImage.NavigationAndStyle.backArrow)],
                                                              right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
         
         let navC = rootNavVC.navigationController!
-        XCTAssert(model.modalNavigationBar == nil)
-        XCTAssert(model.shadowBackgroundView!.superview === rootNavVC.view)
+        XCTAssert(rootNavVC.navigationElements.modalNavigationBar == nil)
+        XCTAssert(rootNavVC.navigationElements.customSuperview == nil)
+        XCTAssert(rootNavVC.navigationElements.shadowBackgroundView!.superview === rootNavVC.view)
         XCTAssert(navC.delegate === (navC as UINavigationControllerDelegate))
         XCTAssert(navC.interactivePopGestureRecognizer!.delegate === (navC as UINavigationControllerDelegate))
         XCTAssert(navC.navigationBar.isTranslucent == true)
@@ -106,20 +110,20 @@ class Tests: XCTestCase {
     
     func test_bottomAnchor_exists() {
         makeNavSUT()
-        let (_, _, _, model) = rootNavVC.set(title: anyText,
+        rootNavVC.set(title: anyText,
                                              left: [.image(UIImage.NavigationAndStyle.backArrow)],
                                              right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
         
-        XCTAssert(model.bottomAnchor != nil)
+        XCTAssert(rootNavVC.navigationElements.bottomAnchor != nil)
     }
     
     func test_navVC_customSuperview() {
         makeNavSUT()
         
         let scrollView = createAndAddScrollView(to: rootNavVC.view)
-        let (_, _, _, model) = rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
+        rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
         
-        XCTAssert(model.shadowBackgroundView!.superview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
+        XCTAssert(rootNavVC.navigationElements.customSuperview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
     }
     
@@ -133,7 +137,7 @@ class Tests: XCTestCase {
     func test_multipleLeftButtons() {
         makeSUT()
         rootVC.set(title: anyText,
-                   left: [UIBarButtonItemType.title(anyText),
+                   left: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
                           UIBarButtonItemType.title(otherText)])
         
         XCTAssert(rootVC.navigationItem.leftBarButtonItems!.count == 2)
@@ -158,9 +162,9 @@ class Tests: XCTestCase {
     
     func test_replaceTitle() {
         makeSUT()
-        rootVC.set(title: anyText)
+        let (view, _, _) = rootVC.set(titleCustomView: anyView)
         
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
+        XCTAssert(view === anyView)
         
         let label = rootVC.change(titleTo: otherText)
         
@@ -173,34 +177,17 @@ class Tests: XCTestCase {
         XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
     }
     
-    func test_replaceTitleWithImageView() {
-        makeSUT()
-        rootVC.set(title: anyText)
-        
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
-        
-        let imageView = rootVC.change(titleToImageViewWith: anyImage)
-        
-        let resultImageView = rootVC.navigationItem.titleView as! UIImageView
-        XCTAssert(resultImageView === imageView)
-        XCTAssert(resultImageView.image == anyImage)
-        
-        rootVC.set(title: anyText)
-        
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
-    }
-    
     func test_replaceTitleWithButton() {
         makeSUT()
         rootVC.set(title: anyText)
         
         XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
         
-        let button = rootVC.change(titleToButtonWith: otherText, and: anyImage)
+        let button = rootVC.change(titleToButtonWith: otherText)
         
         let resultButton = rootVC.navigationItem.titleView as! UIButton
         XCTAssert(resultButton === button)
-        XCTAssert(resultButton.imageView?.image == anyImage)
+        XCTAssert(resultButton.imageView?.image == nil)
         XCTAssert(resultButton.titleLabel?.text == otherText)
         
         rootVC.set(title: anyText)
@@ -211,7 +198,7 @@ class Tests: XCTestCase {
     func test_replaceRightItems() {
         makeSUT()
         rootVC.set(title: anyText,
-                   right: [UIBarButtonItemType.title(anyText),
+                   right: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
                            UIBarButtonItemType.titleAndImage(otherText, image: anyImage),
                            UIBarButtonItemType.image(UIImage.NavigationAndStyle.close),
                            UIBarButtonItemType.image(UIImage.NavigationAndStyle.settings),
@@ -277,7 +264,7 @@ class Tests: XCTestCase {
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons, _) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
+        let (_, leftButtons, rightButtons) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
         let buttonLeft1 = leftButtons.first!
         let buttonLeft2 = leftButtons.last!
         let buttonRight = rightButtons.first!
@@ -301,15 +288,14 @@ class Tests: XCTestCase {
         
         let exp = expectation(description: "waiting")
         exp.expectedFulfillmentCount = 1
-        let titleViewSpyCallback: TitleViewSpyCallback = { (button) in
+        let titleViewSpyCallback: TitleViewButtonSpyCallback = { (button) in
             exp.fulfill()
             
             foundButton = button
         }
         makeSUT(titleViewSpyCallback: titleViewSpyCallback)
         
-        let (_, leftButtons, rightButtons, _) = rootVC.set(title: anyText)
-        let button = rootVC.change(titleToButtonWith: anyText)
+        let (button, leftButtons, rightButtons) = rootVC.set(titleButton: anyText)
         
         XCTAssert(leftButtons.count == 0)
         XCTAssert(rightButtons.count == 0)
@@ -335,12 +321,12 @@ class Tests: XCTestCase {
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons, model) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
+        let (_, leftButtons, rightButtons) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
         XCTAssert(leftButtons.first! == nil && leftButtons.last! == nil && leftButtons.count == 1)
         XCTAssert(rightButtons.first! == nil && rightButtons.last! == nil && leftButtons.count == 1)
         
-        let barItemLeft = model.modalNavigationBar!.items!.last!.leftBarButtonItem!
-        let barItemRight = model.modalNavigationBar!.items!.last!.rightBarButtonItem!
+        let barItemLeft = rootVC.navigationElements.modalNavigationBar!.items!.last!.leftBarButtonItem!
+        let barItemRight = rootVC.navigationElements.modalNavigationBar!.items!.last!.rightBarButtonItem!
         
         rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: barItemLeft)
         rootVC.perform(#selector(rootVC.pressedRight(item:)), with: barItemRight)

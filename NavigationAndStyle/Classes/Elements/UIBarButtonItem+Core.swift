@@ -40,6 +40,7 @@ extension UIBarButtonItem: Identifiable {
             let button = UIButton.build(with: type,
                                         target: target,
                                         action: action,
+                                        isLeft: isLeft,
                                         and: colorStyle)
             newItem = UIBarButtonItem(customView: button)
             newButton = button
