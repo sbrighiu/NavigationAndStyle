@@ -11,23 +11,18 @@ protocol NavigationVC {
     
     func triggerColorStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
     
-    func set(title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UILabel, [UIButton?], [UIButton?])
-    func set(titleButton title: String, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UIButton, [UIButton?], [UIButton?])
-    func set(titleCustomView view: UIView, left: [UIBarButtonItemType], right: [UIBarButtonItemType], overrideModalSuperview: UIView?) -> (UIView, [UIButton?], [UIButton?])
+    func set(title: UINavigationBarItemType, leftItems: [UIBarButtonItemType], rightItems: [UIBarButtonItemType], overrideModalSuperview: UIView?)
     
-    func change(titleTo title: String) -> UILabel
-    func change(titleToCustomView view: UIView) -> UIView
-    func change(titleToButtonWith title: String) -> UIButton
+    func change(title type: UINavigationBarItemType)
+    func change(leftItems items: [UIBarButtonItemType], animated: Bool)
+    func change(rightItems items: [UIBarButtonItemType], animated: Bool)
     
-    func change(leftNavBarItems items: [UIBarButtonItemType], animated: Bool) -> [UIButton?]
-    func change(rightNavBarItems items: [UIBarButtonItemType], animated: Bool) -> [UIButton?]
-    
-    func shouldAutomaticallyDismissFor(_ navBarItemType: UIBarButtonItemType) -> Bool
+    func shouldAutomaticallyDismissFor(_ navBarItemType: UINavigationBarGenericItem) -> Bool
 }
 
 @objc protocol CanHandleVCNavigationActions {
-    func titleViewButtonPressed(with button: UIButton)
-    func navBarItemPressed(with type: UIBarButtonItemType, button: UIButton?, isLeft: Bool)
+    func navBarTitlePressed(with type: UINavigationBarItemType)
+    func navBarItemPressed(with type: UIBarButtonItemType, isLeft: Bool)
 }
 
 private var didSetupDict = [Int: Bool]()
@@ -55,39 +50,10 @@ extension UIViewController: NavigationVC {
     }
     
     // MARK: - Handle initial setup of navigation elements and style
-    @discardableResult public func set(title: String,
-                                       left: [UIBarButtonItemType] = [],
-                                       right: [UIBarButtonItemType] = [],
-                                       overrideModalSuperview: UIView? = nil) -> (UILabel, [UIButton?], [UIButton?]) {
-        let (leftButtonsGroup, rightButtonsGroup) = set(left: left, right: right, overrideModalSuperview: overrideModalSuperview)
-        let titleLabel = change(titleTo: title)
-        
-        return (titleLabel, leftButtonsGroup, rightButtonsGroup)
-    }
-    
-    @discardableResult public func set(titleButton title: String,
-                                       left: [UIBarButtonItemType] = [],
-                                       right: [UIBarButtonItemType] = [],
-                                       overrideModalSuperview: UIView? = nil) -> (UIButton, [UIButton?], [UIButton?]) {
-        let (leftButtonsGroup, rightButtonsGroup) = set(left: left, right: right, overrideModalSuperview: overrideModalSuperview)
-        let titleButton = change(titleToButtonWith: title)
-        
-        return (titleButton, leftButtonsGroup, rightButtonsGroup)
-    }
-    
-    @discardableResult public func set(titleCustomView view: UIView,
-                                       left: [UIBarButtonItemType] = [],
-                                       right: [UIBarButtonItemType] = [],
-                                       overrideModalSuperview: UIView? = nil) -> (UIView, [UIButton?], [UIButton?]) {
-        let (leftButtonsGroup, rightButtonsGroup) = set(left: left, right: right, overrideModalSuperview: overrideModalSuperview)
-        let customView = change(titleToCustomView: view)
-        
-        return (customView, leftButtonsGroup, rightButtonsGroup)
-    }
-    
-    private func set(left: [UIBarButtonItemType] = [],
-                     right: [UIBarButtonItemType] = [],
-                     overrideModalSuperview: UIView? = nil) -> ([UIButton?], [UIButton?]) {
+    public func set(title type: UINavigationBarItemType = .title(""),
+                    leftItems: [UIBarButtonItemType] = [],
+                    rightItems: [UIBarButtonItemType] = [],
+                    overrideModalSuperview: UIView? = nil) {
         if let navC = self.navigationController {
             if overrideModalSuperview != nil {
                 logFrameworkWarning("Please remove the overrideModalSuperview value when an UINavigationController is present for your UIViewController, because it will not be used.")
@@ -98,99 +64,124 @@ extension UIViewController: NavigationVC {
         }
         setupNavigationAndStyle()
         
-        let leftButtonsGroup = change(leftNavBarItems: left)
-        let rightButtonsGroup = change(rightNavBarItems: right)
-        
-        return (leftButtonsGroup, rightButtonsGroup)
+        change(title: type)
+        change(leftItems: leftItems)
+        change(rightItems: rightItems)
     }
     
     // MARK: - Handle changes in titleView
-    @discardableResult public func change(titleTo title: String) -> UILabel {
+    public func change(title type: UINavigationBarItemType) {
         checkSetupStatus()
-        return addLabel(with: title)
-    }
-    
-    @discardableResult public func change(titleToCustomView view: UIView) -> UIView {
-        checkSetupStatus()
-        return addCustomView(with: view)
-    }
-    
-    @discardableResult public func change(titleToButtonWith title: String) -> UIButton {
-        checkSetupStatus()
-        return addButton(with: title)
+        
+        let colorStyle = getColorStyle()
+        
+        var button: UIButton?
+        var imageView: UIImageView?
+        if let _ = type.title {
+            var target: Any?
+            var selector: Selector?
+            if type.isTappable {
+                target = self
+                selector = #selector(pressedNavTitle)
+            }
+            
+            button = UIButton.build(with: type,
+                                    target: target,
+                                    action: selector,
+                                    isLeft: nil,
+                                    and: getColorStyle())
+            imageView = button?.imageView
+            
+            if !type.isTappable {
+                button?.isUserInteractionEnabled = false
+                imageView?.isUserInteractionEnabled = false
+            }
+            
+        } else if let image = type.image {
+            imageView = UIImageView(image: image)
+            imageView?.setup(with: colorStyle)
+            imageView?.saveItemType(type)
+            
+            if type.isTappable {
+                let gesture = UITapGestureRecognizer(target: self, action: #selector(pressedNavTitle))
+                imageView?.addGestureRecognizer(gesture)
+                imageView?.isUserInteractionEnabled = true
+            }
+        }
+        
+        navigationElements.titleImageView = imageView
+        navigationElements.titleViewButton = button
+        
+        getNavigationItem().titleView = button ?? imageView
     }
     
     // MARK: - Handle changes in navigation bar items
-    @discardableResult public func change(leftNavBarItems items: [UIBarButtonItemType], animated: Bool = true) -> [UIButton?] {
+    public func change(leftItems items: [UIBarButtonItemType], animated: Bool = true) {
         checkSetupStatus()
-        let (barItems, buttons) = get(navBarItems: items, isLeft: true)
-        getNavigationItem().setLeftBarButtonItems(barItems, animated: animated)
-        return buttons
+        if items.count == 0 {
+            getNavigationItem().hidesBackButton = true
+        }
+        getNavigationItem().setLeftBarButtonItems(get(navBarItems: items, isLeft: true), animated: animated)
     }
     
-    @discardableResult public func change(rightNavBarItems items: [UIBarButtonItemType], animated: Bool = true) -> [UIButton?] {
+    public func change(rightItems items: [UIBarButtonItemType], animated: Bool = true) {
         checkSetupStatus()
-        let items: [UIBarButtonItemType] = items.reversed()
-        let (barItems, buttons) = get(navBarItems: items, isLeft: false)
-        getNavigationItem().setRightBarButtonItems(barItems, animated: animated)
-        return buttons
+        getNavigationItem().setRightBarButtonItems(get(navBarItems: items.reversed(), isLeft: false), animated: animated)
     }
     
     // MARK: - Handle actions and button creation
-    private func get(navBarItems items: [UIBarButtonItemType], isLeft: Bool) -> ([UIBarButtonItem], [UIButton?]) {
+    private func get(navBarItems items: [UIBarButtonItemType], isLeft: Bool) -> [UIBarButtonItem] {
         let colorStyle = getColorStyle()
-        var buttons = [UIButton?]()
-        var barItems = [UIBarButtonItem]()
-        let _: [(UIBarButtonItem, UIButton?, Bool)] = items.map {
-            let result = UIBarButtonItem.buildSystemItem(with: $0,
-                                                         target: self,
-                                                         action: (isLeft
-                                                            ? #selector(pressedLeft(item:))
-                                                            : #selector(pressedRight(item:))),
-                                                         isLeft: isLeft,
-                                                         and: colorStyle)
-            barItems.append(result.0)
-            buttons.append(result.1)
-            return result
+        return items.map {
+            return UIBarButtonItem.buildSystemItem(with: $0,
+                                                   target: self,
+                                                   action: (isLeft
+                                                    ? #selector(pressedNavLeft(item:))
+                                                    : #selector(pressedNavRight(item:))),
+                                                   isLeft: isLeft,
+                                                   and: colorStyle).0
         }
-        return (barItems, buttons)
     }
     
-    @objc internal func pressedLeft(item: Any) {
-        if let button = item as? UIButton, let type = button.getNavBarItemType() {
-            navBarItemPressed(with: type, button: button, isLeft: true)
-            return
-        } else if let item = item as? UIBarButtonItem, let type = item.getNavBarItemType() {
-            navBarItemPressed(with: type, button: nil, isLeft: true)
+    @objc internal func pressedNavLeft(item: Any) {
+        if let item = item as? IsNavigationBarItem, let type = item.barItemType {
+            navBarItemPressed(with: type, isLeft: true)
             return
         }
-        logFrameworkError("Failed to get type for left button")
+        logFrameworkError("Failed to get type for left button action")
     }
     
-    @objc internal func pressedRight(item: Any) {
-        if let button = item as? UIButton, let type = button.getNavBarItemType() {
-            navBarItemPressed(with: type, button: button, isLeft: false)
-            return
-        } else if let item = item as? UIBarButtonItem, let type = item.getNavBarItemType() {
-            navBarItemPressed(with: type, button: nil, isLeft: false)
+    @objc internal func pressedNavRight(item: Any) {
+        if let item = item as? IsNavigationBarItem, let type = item.barItemType {
+            navBarItemPressed(with: type, isLeft: false)
             return
         }
-        logFrameworkError("Failed to get type for right button")
+        logFrameworkError("Failed to get type for right button action")
+    }
+    
+    @objc internal func pressedNavTitle() {
+        let titleView = navigationElements.titleViewButton ?? navigationElements.titleImageView
+        if let type = titleView?.navItemType {
+            navBarTitlePressed(with: type)
+            return
+        }
+        logFrameworkError("Failed to get type for title action")
     }
 }
 
 // MARK: - Handle taps
 extension UIViewController: CanHandleVCNavigationActions {
-    open func titleViewButtonPressed(with button: UIButton) {
-        assert(false, "Please implement titleViewButtonPressed(with:) in your UIViewController")
+    open func navBarTitlePressed(with type: UINavigationBarItemType) {
+        if shouldAutomaticallyDismissFor(type) { return }
+        assert(false, "Please implement navBarTitlePressed(with:) in your UIViewController")
     }
     
-    open func navBarItemPressed(with type: UIBarButtonItemType, button: UIButton?, isLeft: Bool) {
+    open func navBarItemPressed(with type: UIBarButtonItemType, isLeft: Bool) {
         if shouldAutomaticallyDismissFor(type) { return }
         assert(false, "Please implement navBarItemPressed(with:button:isLeft:) in your UIViewController for \(type)")
     }
     
-    public func shouldAutomaticallyDismissFor(_ navBarItemType: UIBarButtonItemType) -> Bool {
+    public func shouldAutomaticallyDismissFor(_ navBarItemType: UINavigationBarGenericItem) -> Bool {
         if navBarItemType.autoDismiss {
             guard let navC = self.navigationController else {
                 dismiss(animated: true)
@@ -248,15 +239,16 @@ extension UIViewController {
         
         // Update buttons
         let updateBarButtonItemsBlock: ((UIBarButtonItem, Bool)->()) = { item, isLeft in
-            if let type = item.getNavBarItemType() {
-                if type.barButtonItem != nil { return }
-                if type.button != nil { return }
-            }
-            item.tintColor = colorStyle.buttonTitleColor
+            guard let _ = item.barItemType else { return }
+            
             item.button?.configure(with: colorStyle, isLeft: isLeft)
         }
         
         navItem.leftBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, true) })
         navItem.rightBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, false) })
+        
+        // Update titleView
+        navigationElements.titleViewButton?.configure(with: colorStyle, isLeft: nil)
+        navigationElements.titleImageView?.tintColor = colorStyle.imageTint
     }
 }

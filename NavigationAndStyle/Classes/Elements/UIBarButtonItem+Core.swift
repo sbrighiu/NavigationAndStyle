@@ -5,9 +5,7 @@
 import Foundation
 import UIKit
 
-private var systemBarButtonItemsDict = [Int: UIBarButtonItemType]()
-
-extension UIBarButtonItem: Identifiable {
+extension UIBarButtonItem: IsNavigationBarItem {
     internal var button: UIButton? {
         return self.customView as? UIButton
     }
@@ -16,8 +14,8 @@ extension UIBarButtonItem: Identifiable {
                                          target: Any,
                                          action: Selector,
                                          isLeft: Bool,
-                                         and colorStyle: ColorStyle) -> (UIBarButtonItem, UIButton?, Bool) {
-        let newItem: UIBarButtonItem
+                                         and colorStyle: ColorStyle) -> (UIBarButtonItem, UIButton?) {
+        let newItem: UIBarButtonItem!
         var newButton: UIButton?
         if let systemItem = type.systemItem {
             newItem = UIBarButtonItem(barButtonSystemItem: systemItem, target: target, action: action)
@@ -25,17 +23,6 @@ extension UIBarButtonItem: Identifiable {
             if let style = type.systemStyle {
                 newItem.style = style
             }
-            
-        } else if let button = type.button {
-            newButton = button
-            newItem = UIBarButtonItem(customView: button)
-            
-        } else if let view = type.view {
-            newItem = UIBarButtonItem(customView: view)
-            
-        } else if let barButtonItem = type.barButtonItem {
-            newItem = barButtonItem
-            
         } else {
             let button = UIButton.build(with: type,
                                         target: target,
@@ -47,11 +34,7 @@ extension UIBarButtonItem: Identifiable {
             newItem.tintColor = colorStyle.buttonTitleColor
         }
         
-        systemBarButtonItemsDict[newItem.uniqueIdentifier] = type
-        return (newItem, newButton, type.autoDismiss)
-    }
-    
-    internal func getNavBarItemType() -> UIBarButtonItemType? {
-        return systemBarButtonItemsDict[uniqueIdentifier]
+        newItem.saveItemType(type)
+        return (newItem, newButton)
     }
 }

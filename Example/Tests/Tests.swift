@@ -5,11 +5,18 @@
 import XCTest
 @testable import NavigationAndStyle
 
+private let anyTitleItem = UINavigationBarItemType.title(anyText, isTappable: false)
+private let anyTitleItemButton = UINavigationBarItemType.title(anyText)
+private let anyOtherTitleItem = UINavigationBarItemType.title(otherText, isTappable: false)
+private let anyOtherTitleItemButton = UINavigationBarItemType.title(otherText)
+private let anyImageItem = UINavigationBarItemType.title(anyText, isTappable: false)
+private let anyImageItemButton = UINavigationBarItemType.title(anyText)
+
 class Tests: XCTestCase {
     
     // MARK: - Preparation and convenience
-    var rootVC: UIViewController!
-    var rootNavVC: UIViewController!
+    var rootVC: SpyVC!
+    var rootNavVC: SpyVC!
     
     func makeSUT(callback: SpyCallback? = nil, titleViewSpyCallback: TitleViewButtonSpyCallback? = nil) {
         rootVC = UIWindow.makeContextWithVC(buttonCallback: callback, titleViewButtonSpyCallback: titleViewSpyCallback)
@@ -56,7 +63,7 @@ class Tests: XCTestCase {
         ColorStyle.global = ColorStyle()
         
         makeSUT()
-        rootVC.set(title: anyText)
+        rootVC.set(title: anyTitleItem)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
@@ -64,9 +71,9 @@ class Tests: XCTestCase {
         ColorStyle.global = ColorStyle.default
         
         makeSUT()
-        rootVC.set(title: anyText)
+        rootVC.set(title: anyTitleItem)
         
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
+        XCTAssert((rootVC.navigationItem.titleView as! UIButton).titleLabel!.text == anyText)
     }
     
     // MARK: - Functionality tests
@@ -77,7 +84,7 @@ class Tests: XCTestCase {
     
     func test_modalVC() {
         makeSUT()
-        rootVC.set(title: anyText)
+        rootVC.set(title: anyTitleItem)
         XCTAssert(rootVC.didSetupCustomNavigationAndStyle)
     }
     
@@ -85,7 +92,7 @@ class Tests: XCTestCase {
         makeSUT()
         
         let scrollView = createAndAddScrollView(to: rootVC.view)
-        let (_, _, _) = rootVC.set(title: anyText, overrideModalSuperview: scrollView)
+        rootVC.set(title: anyTitleItem, overrideModalSuperview: scrollView)
         
         XCTAssert(rootVC.navigationElements.customSuperview === scrollView)
         XCTAssert(rootVC.navigationElements.shadowBackgroundView!.superview === scrollView)
@@ -94,9 +101,9 @@ class Tests: XCTestCase {
     
     func test_navVC() {
         makeNavSUT()
-        let (_, _, _) = rootNavVC.set(title: anyText,
-                                                             left: [.image(UIImage.NavigationAndStyle.backArrow)],
-                                                             right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
+        rootNavVC.set(title: anyTitleItem,
+                      leftItems: [.image(UIImage.NavigationAndStyle.backArrow)],
+                      rightItems: [.image(UIImage.NavigationAndStyle.forwardArrow)])
         
         let navC = rootNavVC.navigationController!
         XCTAssert(rootNavVC.navigationElements.modalNavigationBar == nil)
@@ -110,9 +117,9 @@ class Tests: XCTestCase {
     
     func test_bottomAnchor_exists() {
         makeNavSUT()
-        rootNavVC.set(title: anyText,
-                                             left: [.image(UIImage.NavigationAndStyle.backArrow)],
-                                             right: [.image(UIImage.NavigationAndStyle.forwardArrow)])
+        rootNavVC.set(title: anyTitleItem,
+                      leftItems: [.image(UIImage.NavigationAndStyle.backArrow)],
+                      rightItems: [.image(UIImage.NavigationAndStyle.forwardArrow)])
         
         XCTAssert(rootNavVC.navigationElements.bottomAnchor != nil)
     }
@@ -121,7 +128,7 @@ class Tests: XCTestCase {
         makeNavSUT()
         
         let scrollView = createAndAddScrollView(to: rootNavVC.view)
-        rootNavVC.set(title: anyText, overrideModalSuperview: scrollView)
+        rootNavVC.set(title: anyTitleItem, overrideModalSuperview: scrollView)
         
         XCTAssert(rootNavVC.navigationElements.customSuperview !== scrollView) // Will always be ignored when using an UINavigationController since the superview is handled by the navigation controller and cannot be changed
         XCTAssert(rootNavVC.didSetupCustomNavigationAndStyle)
@@ -129,15 +136,15 @@ class Tests: XCTestCase {
     
     func test_oneLeftButton() {
         makeSUT()
-        rootVC.set(title: anyText, left: [UIBarButtonItemType.title(anyText)])
+        rootVC.set(title: anyTitleItem, leftItems: [UIBarButtonItemType.title(anyText)])
         
         XCTAssertNotNil(rootVC.navigationItem.leftBarButtonItem)
     }
     
     func test_multipleLeftButtons() {
         makeSUT()
-        rootVC.set(title: anyText,
-                   left: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
+        rootVC.set(title: anyTitleItem,
+                   leftItems: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
                           UIBarButtonItemType.title(otherText)])
         
         XCTAssert(rootVC.navigationItem.leftBarButtonItems!.count == 2)
@@ -145,15 +152,15 @@ class Tests: XCTestCase {
     
     func test_oneRightButton() {
         makeSUT()
-        rootVC.set(title: anyText, right: [UIBarButtonItemType.title(anyText)])
+        rootVC.set(title: anyTitleItem, rightItems: [UIBarButtonItemType.title(anyText)])
         
         XCTAssertNotNil(rootVC.navigationItem.rightBarButtonItem)
     }
     
     func test_multipleRightButtons() {
         makeSUT()
-        rootVC.set(title: anyText,
-                   right: [UIBarButtonItemType.title(anyText),
+        rootVC.set(title: anyTitleItem,
+                   rightItems: [UIBarButtonItemType.title(anyText),
                            UIBarButtonItemType.title(otherText),
                            UIBarButtonItemType.image(UIImage.NavigationAndStyle.close)])
         
@@ -162,58 +169,36 @@ class Tests: XCTestCase {
     
     func test_replaceTitle() {
         makeSUT()
-        let (view, _, _) = rootVC.set(titleCustomView: anyView)
+        rootVC.set(title: anyTitleItem)
         
-        XCTAssert(view === anyView)
+        var temp = rootVC.navigationElements.titleViewButton
         
-        let label = rootVC.change(titleTo: otherText)
+        rootVC.change(title: anyTitleItem)
         
-        let resultLabel = rootVC.navigationItem.titleView as! UILabel
-        XCTAssert(resultLabel === label)
-        XCTAssert(resultLabel.text == otherText)
+        XCTAssert(rootVC.navigationElements.titleViewButton !== temp)
+        temp = rootVC.navigationElements.titleViewButton
         
-        rootVC.set(title: anyText)
+        rootVC.set(title: anyTitleItem)
         
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
-    }
-    
-    func test_replaceTitleWithButton() {
-        makeSUT()
-        rootVC.set(title: anyText)
-        
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
-        
-        let button = rootVC.change(titleToButtonWith: otherText)
-        
-        let resultButton = rootVC.navigationItem.titleView as! UIButton
-        XCTAssert(resultButton === button)
-        XCTAssert(resultButton.imageView?.image == nil)
-        XCTAssert(resultButton.titleLabel?.text == otherText)
-        
-        rootVC.set(title: anyText)
-        
-        XCTAssert((rootVC.navigationItem.titleView as! UILabel).text == anyText)
+        XCTAssert(rootVC.navigationElements.titleViewButton !== temp)
     }
     
     func test_replaceRightItems() {
         makeSUT()
-        rootVC.set(title: anyText,
-                   right: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
+        rootVC.set(title: anyTitleItem,
+                   rightItems: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
                            UIBarButtonItemType.titleAndImage(otherText, image: anyImage),
                            UIBarButtonItemType.image(UIImage.NavigationAndStyle.close),
-                           UIBarButtonItemType.image(UIImage.NavigationAndStyle.settings),
-                           UIBarButtonItemType.button(anyButton),
-                           UIBarButtonItemType.view(anyView),
-                           UIBarButtonItemType.raw(anyBarButtonItem)])
+                           UIBarButtonItemType.image(UIImage.NavigationAndStyle.settings)])
         
-        XCTAssert(rootVC.navigationItem.rightBarButtonItems!.count == 7)
+        XCTAssert(rootVC.navigationItem.rightBarButtonItems!.count == 4)
         
-        rootVC.change(rightNavBarItems: [.systemItem(.cancel)])
+        rootVC.change(rightItems: [.systemItem(.cancel)])
         
         XCTAssert(rootVC.navigationItem.rightBarButtonItems!.count == 1)
         
-        rootVC.set(title: anyText,
-                   right: [UIBarButtonItemType.title(anyText),
+        rootVC.set(title: anyTitleItem,
+                   rightItems: [UIBarButtonItemType.title(anyText),
                            UIBarButtonItemType.title(otherText),
                            UIBarButtonItemType.image(UIImage.NavigationAndStyle.close)])
         
@@ -222,17 +207,17 @@ class Tests: XCTestCase {
     
     func test_replaceLeftItems() {
         makeSUT()
-        rootVC.set(title: anyText,
-                   left: [UIBarButtonItemType.systemItem(.cancel)])
+        rootVC.set(title: anyTitleItem,
+                   leftItems: [UIBarButtonItemType.systemItem(.cancel)])
         
         XCTAssert((rootVC.navigationItem.leftBarButtonItems ?? []).count == 1)
         
-        rootVC.change(leftNavBarItems: [])
+        rootVC.change(leftItems: [])
         
         XCTAssert((rootVC.navigationItem.leftBarButtonItems ?? []).count == 0)
         
-        rootVC.set(title: anyText,
-                   left: [UIBarButtonItemType.systemItem(.cancel)])
+        rootVC.set(title: anyTitleItem,
+                   leftItems: [UIBarButtonItemType.systemItem(.cancel)])
         
         XCTAssert((rootVC.navigationItem.leftBarButtonItems ?? []).count == 1)
     }
@@ -242,69 +227,50 @@ class Tests: XCTestCase {
         let barItemLeftType1 = UIBarButtonItemType.title(anyText)
         let barItemLeftType2 = UIBarButtonItemType.title(otherText)
         let barItemRightType = UIBarButtonItemType.image(anyImage)
-        
-        var foundLeftButton1: UIButton?
-        var foundLeftButton2: UIButton?
-        var foundRightButton: UIButton?
-        
+   
         let exp = expectation(description: "waiting")
         exp.expectedFulfillmentCount = 3
-        let callback: SpyCallback = { (type, button, isLeft) in
+        let callback: SpyCallback = { (type, isLeft) in
             exp.fulfill()
-            if isLeft {
-                if foundLeftButton1 == nil {
-                    foundLeftButton1 = button
-                } else if foundLeftButton2 == nil {
-                    foundLeftButton2 = button
-                }
-            } else {
-                foundRightButton = button
-            }
             XCTAssert((isLeft && barItemLeftType1 === type || barItemLeftType2 === type) || (!isLeft && barItemRightType === type))
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons) = rootVC.set(title: anyText, left: [barItemLeftType1, barItemLeftType2], right: [barItemRightType])
-        let buttonLeft1 = leftButtons.first!
-        let buttonLeft2 = leftButtons.last!
-        let buttonRight = rightButtons.first!
+        rootVC.set(title: anyTitleItem, leftItems: [barItemLeftType1, barItemLeftType2], rightItems: [barItemRightType])
         
-        XCTAssert(leftButtons.count == 2)
-        XCTAssert(rightButtons.count == 1)
+        XCTAssert(rootVC.leftButtons.count == 2)
+        XCTAssert(rootVC.rightButtons.count == 1)
         
-        rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: buttonLeft1)
-        rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: buttonLeft2)
-        rootVC.perform(#selector(rootVC.pressedRight(item:)), with: buttonRight)
+        rootVC.perform(#selector(rootVC.pressedNavLeft(item:)), with: rootVC.leftButtons.first!)
+        rootVC.perform(#selector(rootVC.pressedNavLeft(item:)), with: rootVC.leftButtons.last!)
+        rootVC.perform(#selector(rootVC.pressedNavRight(item:)), with: rootVC.rightButtons.first!)
         
         waitForExpectations(timeout: 1.0, handler: nil)
-        
-        XCTAssert(foundLeftButton1 === buttonLeft1)
-        XCTAssert(foundLeftButton2 === buttonLeft2)
-        XCTAssert(foundRightButton === buttonRight)
     }
     
     func test_titleViewButtonActions() {
-        var foundButton: UIButton?
+        var foundType: UINavigationBarItemType?
         
         let exp = expectation(description: "waiting")
         exp.expectedFulfillmentCount = 1
-        let titleViewSpyCallback: TitleViewButtonSpyCallback = { (button) in
+        let titleViewSpyCallback: TitleViewButtonSpyCallback = { (type) in
             exp.fulfill()
             
-            foundButton = button
+            foundType = type
         }
         makeSUT(titleViewSpyCallback: titleViewSpyCallback)
         
-        let (button, leftButtons, rightButtons) = rootVC.set(titleButton: anyText)
+        let type = anyTitleItemButton
+        rootVC.set(title: type)
         
-        XCTAssert(leftButtons.count == 0)
-        XCTAssert(rightButtons.count == 0)
+        XCTAssert(rootVC.leftButtons.count == 0)
+        XCTAssert(rootVC.rightButtons.count == 0)
         
-        rootVC.perform(#selector(rootVC.titleViewButtonPressed(with:)), with: button)
+        rootVC.perform(#selector(rootVC.pressedNavTitle), with: nil)
         
         waitForExpectations(timeout: 1.0, handler: nil)
         
-        XCTAssert(foundButton === button)
+        XCTAssert(foundType === type)
     }
     
     func test_systemButtonActions() {
@@ -313,23 +279,27 @@ class Tests: XCTestCase {
         
         let exp = expectation(description: "waiting")
         exp.expectedFulfillmentCount = 2
-
-        let callback: SpyCallback = { (type, button, isLeft) in
+        
+        let callback: SpyCallback = { (type, isLeft) in
             exp.fulfill()
-            XCTAssert(button == nil)
+            
             XCTAssert((isLeft && barItemLeftType === type) || (!isLeft && barItemRightType === type))
         }
         makeSUT(callback: callback)
         
-        let (_, leftButtons, rightButtons) = rootVC.set(title: anyText, left: [barItemLeftType], right: [barItemRightType])
+        rootVC.set(title: anyTitleItem, leftItems: [barItemLeftType], rightItems: [barItemRightType])
+        
+        let leftButtons = rootVC.leftButtons
+        let rightButtons = rootVC.rightButtons
+        
         XCTAssert(leftButtons.first! == nil && leftButtons.last! == nil && leftButtons.count == 1)
         XCTAssert(rightButtons.first! == nil && rightButtons.last! == nil && leftButtons.count == 1)
         
         let barItemLeft = rootVC.navigationElements.modalNavigationBar!.items!.last!.leftBarButtonItem!
         let barItemRight = rootVC.navigationElements.modalNavigationBar!.items!.last!.rightBarButtonItem!
         
-        rootVC.perform(#selector(rootVC.pressedLeft(item:)), with: barItemLeft)
-        rootVC.perform(#selector(rootVC.pressedRight(item:)), with: barItemRight)
+        rootVC.perform(#selector(rootVC.pressedNavLeft(item:)), with: barItemLeft)
+        rootVC.perform(#selector(rootVC.pressedNavRight(item:)), with: barItemRight)
         
         waitForExpectations(timeout: 1.0, handler: nil)
     }
@@ -338,7 +308,7 @@ class Tests: XCTestCase {
         // Left VC
         makeSUT()
         let typeLeft = UIBarButtonItemType.title(anyText)
-        rootVC.set(title: anyText, left: [typeLeft])
+        rootVC.set(title: anyTitleItem, leftItems: [typeLeft])
         
         XCTAssertNotNil(rootVC.navigationItem.leftBarButtonItem)
         XCTAssert(rootVC.shouldAutomaticallyDismissFor(typeLeft) == false)
@@ -346,21 +316,21 @@ class Tests: XCTestCase {
         // Right VC
         makeSUT()
         let typeRight = UIBarButtonItemType.title(anyText, autoDismiss: true)
-        rootVC.set(title: anyText, right: [typeRight])
+        rootVC.set(title: anyTitleItem, rightItems: [typeRight])
         
         XCTAssertNotNil(rootVC.navigationItem.rightBarButtonItem)
         XCTAssert(rootVC.shouldAutomaticallyDismissFor(typeRight) == true)
         
         // Left NavVC
         makeNavSUT()
-        rootNavVC.set(title: anyText, left: [typeLeft])
+        rootNavVC.set(title: anyTitleItem, leftItems: [typeLeft])
         
         XCTAssertNotNil(rootNavVC.navigationItem.leftBarButtonItem)
         XCTAssert(rootNavVC.shouldAutomaticallyDismissFor(typeLeft) == false)
         
         // Right NavVC
         makeNavSUT()
-        rootNavVC.set(title: anyText, right: [typeRight])
+        rootNavVC.set(title: anyTitleItem, rightItems: [typeRight])
         
         XCTAssertNotNil(rootNavVC.navigationItem.rightBarButtonItem)
         XCTAssert(rootNavVC.shouldAutomaticallyDismissFor(typeRight) == true)
@@ -369,7 +339,7 @@ class Tests: XCTestCase {
         exp.expectedFulfillmentCount = 1
         
         let vc = UIViewController()
-        vc.set(title: anyText, right: [typeRight])
+        vc.set(title: anyTitleItem, rightItems: [typeRight])
         
         rootNavVC.navigationController?.pushViewController(vc, animated: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -385,15 +355,15 @@ class Tests: XCTestCase {
         exp.expectedFulfillmentCount = 1
         
         let vc = UIViewController()
-        vc.set(title: anyText)
+        vc.set(title: anyTitleItem)
         
         makeNavSUT()
-        rootNavVC.set(title: otherText)
+        rootNavVC.set(title: anyOtherTitleItem)
         
         rootNavVC.navigationController?.present(vc, animated: false, completion: {
             exp.fulfill()
             
-            XCTAssert((vc.navigationItem.titleView as! UILabel).text == anyText)
+            XCTAssert((vc.navigationItem.titleView as! UIButton).titleLabel!.text == anyText)
         })
         
         waitForExpectations(timeout: 1.0, handler: nil)
@@ -401,14 +371,14 @@ class Tests: XCTestCase {
     
     func test_pushPresentTest() {
         let vc = UIViewController()
-        vc.set(title: anyText)
+        vc.set(title: anyTitleItem)
         
         makeNavSUT()
-        rootNavVC.set(title: otherText)
+        rootNavVC.set(title: anyOtherTitleItem)
         
         rootNavVC.navigationController?.pushViewController(vc, animated: false)
         
-        XCTAssert((vc.navigationItem.titleView as! UILabel).text == anyText)
+        XCTAssert((vc.navigationItem.titleView as! UIButton).titleLabel!.text == anyText)
         
         XCTAssert(self.rootNavVC.navigationController?.topViewController === vc)
     }

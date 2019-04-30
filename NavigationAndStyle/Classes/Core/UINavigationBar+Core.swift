@@ -1,11 +1,11 @@
 //
-//  Copyright © 2019 ___ORGANIZATIONNAME___. All rights reserved.
+//  Copyright © 2019 Stefan Brighiu. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-extension UINavigationBar: Identifiable {
+extension UINavigationBar {
     func changeToTransparent() {
         self.isTranslucent = true
         
