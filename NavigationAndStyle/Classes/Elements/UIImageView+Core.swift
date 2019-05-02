@@ -6,9 +6,10 @@ import Foundation
 import UIKit
 
 extension UIImageView {
-    func setup(with colorStyle: ColorStyle) {
+    internal func configure(with colorStyle: ColorStyle) {
         self.contentMode = .scaleAspectFit
         self.clipsToBounds = true
         self.tintColor = colorStyle.imageTint
     }
+    
 }

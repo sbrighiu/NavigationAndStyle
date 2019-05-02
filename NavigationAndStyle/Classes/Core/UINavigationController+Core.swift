@@ -12,12 +12,12 @@ private var popDoneWithTouch = false
 protocol NavigationC {
     var navigationBar: UINavigationBar { get }
     
-    func setupNavigationConvenienceSettings(from vc: UIViewController)
+    func setupNavigationConvenienceSettings()
 }
 
 // MARK: - Handler Interactive slide-from-edge to back
 extension UINavigationController: NavigationC {
-    open func setupNavigationConvenienceSettings(from vc: UIViewController) {
+    internal func setupNavigationConvenienceSettings() {
         if self.delegate == nil {
             self.interactivePopGestureRecognizer?.removeTarget(self, action: nil)
             self.interactivePopGestureRecognizer?.isEnabled = true
@@ -77,22 +77,22 @@ extension UINavigationController {
 // MARK: - Boilerplate
 // MARK: UINavigationControllerDelegate event handling
 extension UINavigationController: UINavigationControllerDelegate {
-    open func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+    @objc open func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         navigationControllerAction(navigationController, willShow: viewController, animated: animated)
     }
     
-    open func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+    @objc open func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         navigationControllerAction(navigationController, didShow: viewController, animated: animated)
     }
 }
 
 // MARK: InteractivePopGestureRecognizer delegate handling
 extension UINavigationController: UIGestureRecognizerDelegate {
-    open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    @objc open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return gestureRecognizerShouldBeginAction(gestureRecognizer)
     }
     
-    open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    @objc open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return gestureRecognizerAction(gestureRecognizer, shouldBeRequiredToFailBy: otherGestureRecognizer)
     }
 }

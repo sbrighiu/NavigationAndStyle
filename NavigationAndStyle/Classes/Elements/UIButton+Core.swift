@@ -13,8 +13,7 @@ extension UIButton {
                                and colorStyle: ColorStyle) -> UIButton {
         let newButton = createButton(target: target,
                                      selector: selector,
-                                     forEvent: (type as? UIBarButtonItemType) != nil ? .touchDown : .touchUpInside,
-                                     and: colorStyle)
+                                     forEvent: (type as? UIBarButtonItemType) != nil ? .touchDown : .touchUpInside)
         
         newButton.saveItemType(type)
         return newButton.configure(with: colorStyle, isLeft: isLeft)
@@ -22,8 +21,7 @@ extension UIButton {
     
     private static func createButton(target: Any?,
                                      selector: Selector?,
-                                     forEvent event: UIControl.Event?,
-                                     and colorStyle: ColorStyle) -> UIButton {
+                                     forEvent event: UIControl.Event?) -> UIButton {
         let newButton = UIButton(type: .custom)
         newButton.frame = CGRect(x: 0, y: 0, width: Constants.recommendedItemHeight, height: Constants.recommendedItemHeight)
         
@@ -40,9 +38,17 @@ extension UIButton {
     @discardableResult internal func configure(with colorStyle: ColorStyle, isLeft: Bool?) -> UIButton {
         guard let genericType = genericItemType else { return self }
         
+        var targetTitle = genericType.title ?? ""
+        
         var font: UIFont
         var color: UIColor
         if let isLeft = isLeft, let type = barItemType {
+            if let image = type.image {
+                self.setImage(image, for: .normal)
+                self.imageView?.configure(with: colorStyle)
+                
+                targetTitle.insert(" ", at: targetTitle.startIndex)
+            }
             self.contentEdgeInsets = type.contentInsets(forLeftElement: isLeft)
             
             font = colorStyle.buttonFont
@@ -55,14 +61,6 @@ extension UIButton {
         } else {
             logFrameworkError("Button was not configured properly.")
             return self
-        }
-        
-        var targetTitle = genericType.title ?? ""
-        if let image = genericType.image {
-            self.setImage(image, for: .normal)
-            self.imageView?.setup(with: colorStyle)
-            
-            targetTitle.insert(" ", at: targetTitle.startIndex)
         }
         
         self.tintColor = color

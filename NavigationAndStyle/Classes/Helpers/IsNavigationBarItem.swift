@@ -6,7 +6,7 @@ import Foundation
 
 private var navBarItemTypes = [Int: UINavigationBarGenericItem]()
 
-protocol IsNavigationBarItem: Identifiable {
+internal protocol IsNavigationBarItem: Identifiable {
     var navItemType: UINavigationBarItemType? { get }
     var barItemType: UIBarButtonItemType? { get }
     var genericItemType: UINavigationBarGenericItem? { get }
@@ -15,19 +15,19 @@ protocol IsNavigationBarItem: Identifiable {
 }
 
 extension IsNavigationBarItem {
-    var genericItemType: UINavigationBarGenericItem? {
+    internal var genericItemType: UINavigationBarGenericItem? {
         return navBarItemTypes[uniqueIdentifier]
     }
     
-    var navItemType: UINavigationBarItemType? {
+    internal var navItemType: UINavigationBarItemType? {
         return navBarItemTypes[uniqueIdentifier] as? UINavigationBarItemType
     }
     
-    var barItemType: UIBarButtonItemType? {
+    internal var barItemType: UIBarButtonItemType? {
         return navBarItemTypes[uniqueIdentifier] as? UIBarButtonItemType
     }
     
-    func saveItemType(_ type: UINavigationBarGenericItem) {
+    internal func saveItemType(_ type: UINavigationBarGenericItem) {
         navBarItemTypes[uniqueIdentifier] = type
     }
 }

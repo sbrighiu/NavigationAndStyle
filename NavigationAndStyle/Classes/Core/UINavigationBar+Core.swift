@@ -6,7 +6,7 @@ import Foundation
 import UIKit
 
 extension UINavigationBar {
-    func changeToTransparent() {
+    internal func setupAndChangeToTransparent() {
         self.isTranslucent = true
         
         self.backgroundColor = .clear

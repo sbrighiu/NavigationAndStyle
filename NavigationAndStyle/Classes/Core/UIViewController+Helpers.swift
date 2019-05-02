@@ -15,6 +15,14 @@ extension UIViewController {
     }
 }
 
+extension UINavigationController {
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setupNavigationConvenienceSettings()
+    }
+}
+
 extension UIViewController {
     
     internal func addMaskView(to superView: UIView) -> UIImageView {
@@ -123,30 +131,47 @@ extension UIViewController {
     }
 }
 
-// MARK: - NavigationElementsModel management
-private var models = [Int: NavigationElementsModel]()
+// MARK: - Handle titleView
+extension UIViewController {
+    internal func addButtonTitleView(with type: UINavigationBarItemType) {
+        var target: Any?
+        var selector: Selector?
+        if type.isTappable {
+            target = self
+            selector = #selector(pressedNavTitle)
+        }
+        
+        let button = UIButton.build(with: type,
+                                    target: target,
+                                    action: selector,
+                                    isLeft: nil,
+                                    and: getColorStyle())
+        
+        if !type.isTappable {
+            button.isUserInteractionEnabled = false
+        }
+        
+        getNavigationItem().titleView = button
+    }
+}
 
-public class NavigationElementsModel {
+// MARK: - NavigationElementsModel management
+private var models = [Int: NavigationVCModel]()
+
+public class NavigationVCModel {
     public weak var modalNavigationBar: UINavigationBar?
     public weak var backgroundImageView: UIImageView?
     public weak var hairlineSeparatorView: UIView?
     public weak var shadowBackgroundView: UIImageView?
     
-    public weak var titleImageView: UIImageView?
-    public weak var titleViewButton: UIButton?
-    
-    public var customSuperview: UIView? {
-        return modalNavigationBar?.superview
-    }
-    
     public var bottomAnchor: NSLayoutYAxisAnchor? {
         if hairlineSeparatorView?.backgroundColor == .clear {
             return backgroundImageView?.bottomAnchor
         }
-        return hairlineSeparatorView?.bottomAnchor ?? backgroundImageView?.bottomAnchor
+        return hairlineSeparatorView?.bottomAnchor
     }
     
-    func removeFromSuperview() {
+    internal func removeFromSuperview() {
         modalNavigationBar?.removeFromSuperview()
         backgroundImageView?.removeFromSuperview()
         hairlineSeparatorView?.removeFromSuperview()
@@ -155,9 +180,9 @@ public class NavigationElementsModel {
 }
 
 extension UIViewController: Identifiable {
-    public var navigationElements: NavigationElementsModel {
-        let value = models[uniqueIdentifier] ?? NavigationElementsModel()
-        models[uniqueIdentifier] = value
-        return value
+    public var navigationElements: NavigationVCModel {
+        let model = models[uniqueIdentifier] ?? NavigationVCModel()
+        models[uniqueIdentifier] = model
+        return model
     }
 }

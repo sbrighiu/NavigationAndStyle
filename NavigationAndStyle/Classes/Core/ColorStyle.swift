@@ -11,15 +11,12 @@ import UIKit
 
 extension UIViewController: CanHaveColorStyle {
     open func getColorStyle() -> ColorStyle {
-        return splitViewController?.getColorStyle() ??
-            tabBarController?.getColorStyle() ??
-            navigationController?.getColorStyle() ??
+        return navigationController?.getColorStyle() ??
             ColorStyle.global
     }
 }
 
 open class ColorStyle: NSObject {
-    
     // MARK: - Convenience styles
     public static var global = ColorStyle()
     
@@ -114,11 +111,11 @@ open class ColorStyle: NSObject {
         return statusBarStyle == .default ? .default : .black
     }
     
-    open func highlightColor(for color: UIColor) -> UIColor {
+    public func highlightColor(for color: UIColor) -> UIColor {
         return Defaults.highlightColor(for: color, highlightAlpha: highlightAlpha)
     }
     
-    // MARK: - Default values singleton for global style
+    // MARK: - Default values for global style
     public class Defaults {
         public static var highlightAlpha: CGFloat = 0.66
         public static func highlightColor(for color: UIColor, highlightAlpha: CGFloat = Defaults.highlightAlpha) -> UIColor {
@@ -127,7 +124,7 @@ open class ColorStyle: NSObject {
         
         public static var titleFont: UIFont = .boldSystemFont(ofSize: 17)
         
-        public static var buttonFont: UIFont = .boldSystemFont(ofSize: 17)
+        public static var buttonFont: UIFont = .systemFont(ofSize: 17)
         
         public static var disabledColor: UIColor = .lightGray
         
@@ -151,5 +148,4 @@ open class ColorStyle: NSObject {
             return 1
         }
     }
-    
 }

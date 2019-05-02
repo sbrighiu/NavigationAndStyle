@@ -4,12 +4,12 @@
 
 import Foundation
 
-protocol Identifiable: class {
+internal protocol Identifiable: class {
     var uniqueIdentifier: Int { get }
 }
 
 extension Identifiable {
-    var uniqueIdentifier: Int {
+    internal var uniqueIdentifier: Int {
         return ObjectIdentifier(self).hashValue
     }
 }

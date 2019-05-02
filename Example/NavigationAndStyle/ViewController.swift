@@ -6,7 +6,6 @@ import UIKit
 import NavigationAndStyle
 
 private extension UIBarButtonItemType {
-    
     struct left {
         static let close: UIBarButtonItemType = {
             return .image(UIImage.NavigationAndStyle.close, extendTapAreaBy: 24, autoDismiss: true)
@@ -17,8 +16,8 @@ private extension UIBarButtonItemType {
         static let backWithText: UIBarButtonItemType = {
             return .titleAndImage(NSLocalizedString("Back", comment: ""), image: UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
         }()
-        static let test: UIBarButtonItemType = {
-            return .title(NSLocalizedString("Test", comment: ""))
+        static let settings: UIBarButtonItemType = {
+            return .image(UIImage.NavigationAndStyle.settings, extendTapAreaBy: 24)
         }()
     }
     
@@ -27,7 +26,7 @@ private extension UIBarButtonItemType {
             return .systemItem(UIBarButtonItem.SystemItem.cancel)
         }()
         static let dismiss: UIBarButtonItemType = {
-            return .title(NSLocalizedString("Dismiss", comment: ""))
+            return .title(NSLocalizedString("Dismiss", comment: ""), autoDismiss: true)
         }()
         static let new: UIBarButtonItemType = {
             return .title(NSLocalizedString("New", comment: ""))
@@ -41,42 +40,32 @@ private extension UIBarButtonItemType {
 private extension UINavigationBarItemType {
     struct middle {
         static var label: UINavigationBarItemType = {
-            return UINavigationBarItemType.title("Label")
+            return UINavigationBarItemType.label("Label")
         }()
         static var button: UINavigationBarItemType = {
-            return UINavigationBarItemType.title("Button", isTappable: true)
-        }()
-        static var image: UINavigationBarItemType = {
-            return UINavigationBarItemType.image(testImage)
-        }()
-        static var tappableImage: UINavigationBarItemType = {
-            return UINavigationBarItemType.image(testImage, isTappable: true)
+            return UINavigationBarItemType.button("Button", autoDismiss: true)
         }()
     }
-    
-}
-
-let testImage = UIImage(named: "yin-yang")!.withRenderingMode(.alwaysTemplate)
-
-private var newView: UIView {
-    let view = UIView()
-    view.backgroundColor = .red
-    view.layer.cornerRadius = 11
-    return view
 }
 
 var numberOfVC = 0
 
 class ViewController: UIViewController {
     
+    var alternativeStyle: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-     
+        
         numberOfVC += 1
+        
+        if numberOfVC.isMultiple(of: 2) {
+            alternativeStyle = true
+        }
         
         if let navC = self.navigationController {
             if UIApplication.shared.delegate?.window??.rootViewController != self.navigationController {
-                set(title: UINavigationBarItemType.middle.tappableImage,
+                set(title: UINavigationBarItemType.middle.button,
                     rightItems: [UIBarButtonItemType.right.dismiss,
                                  UIBarButtonItemType.right.temp])
                 
@@ -85,26 +74,25 @@ class ViewController: UIViewController {
                                               UIBarButtonItemType.right.dismiss])
                 }
             } else if navC.viewControllers.count == 1 {
-                set(title: UINavigationBarItemType.middle.button,
-                    leftItems: [UIBarButtonItemType.left.test])
+                set(title: UINavigationBarItemType.middle.label,
+                    leftItems: [UIBarButtonItemType.left.settings])
                 
             } else if navC.viewControllers.count == 2 {
-                set(title: UINavigationBarItemType.middle.label,
-                    leftItems: [UIBarButtonItemType.left.backWithText],
-                    rightItems: [UIBarButtonItemType.right.cancel])
-                
-            } else {
-                set(title: UINavigationBarItemType.middle.image,
+                set(title: UINavigationBarItemType.middle.button,
                     leftItems: [UIBarButtonItemType.left.back],
                     rightItems: [UIBarButtonItemType.right.cancel])
                 
+            } else {
+                set(title: UINavigationBarItemType.middle.label,
+                    leftItems: [UIBarButtonItemType.left.backWithText],
+                    rightItems: [UIBarButtonItemType.right.cancel])
             }
         } else {
             set(title: UINavigationBarItemType.middle.button,
                 leftItems: [UIBarButtonItemType.left.close])
         }
     }
-
+    
     override func navBarTitlePressed(with type: UINavigationBarItemType) {
         let alert = UIAlertController.init(title: "titleView tapped", message: nil, preferredStyle: .alert)
         self.present(alert, animated: true)
@@ -115,9 +103,7 @@ class ViewController: UIViewController {
     }
     
     override func navBarItemPressed(with type: UIBarButtonItemType, isLeft: Bool) {
-        if shouldAutomaticallyDismissFor(type) { return }
-        
-        if type == UIBarButtonItemType.right.cancel || type == UIBarButtonItemType.right.dismiss {
+        if type == UIBarButtonItemType.right.cancel {
             if let navC = self.navigationController, self != self.navigationController?.viewControllers.first {
                 navC.popToRootViewController(animated: true)
             } else {
@@ -139,6 +125,10 @@ class ViewController: UIViewController {
         }
     }
     
+    override func willAutomaticallyDismiss() {
+        print("Screen dismissed via auto-dismiss")
+    }
+    
     @IBAction func dismissModal() {
         dismiss(animated: true, completion: nil)
     }
@@ -146,10 +136,18 @@ class ViewController: UIViewController {
     override func getColorStyle() -> ColorStyle {
         if navigationController == nil {
             self.view.backgroundColor = .black
-            return ColorStyle.transparent(statusBarStyle: .lightContent,
-                                          titleColor: .white,
-                                          buttonTitleColor: .white,
-                                          imageTint: .white)
+            if alternativeStyle {
+                return ColorStyle.transparent(statusBarStyle: .lightContent,
+                                              titleColor: .white,
+                                              buttonTitleColor: .white,
+                                              imageTint: .white)
+            } else {
+                return ColorStyle(statusBarStyle: .default,
+                                  background: .white,
+                                  titleColor: .black,
+                                  buttonTitleColor: .black,
+                                  imageTint: .black)
+            }
         } else {
             if navigationController?.viewControllers.count == 2 {
                 return ColorStyle(statusBarStyle: .lightContent,
@@ -159,7 +157,7 @@ class ViewController: UIViewController {
                                   imageTint: .white)
                 
             } else if navigationController?.viewControllers.count == 3 {
-                return ColorStyle.transparent(statusBarStyle: .default,
+                return ColorStyle.transparent(statusBarStyle: .lightContent,
                                               shadow: UIColor.black.withAlphaComponent(0.33),
                                               titleColor: .white,
                                               buttonTitleColor: .white,
@@ -180,5 +178,4 @@ class ViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return getColorStyle().statusBarStyle
     }
-    
 }

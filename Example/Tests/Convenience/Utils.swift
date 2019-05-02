@@ -3,6 +3,7 @@
 //
 
 import UIKit
+@testable import NavigationAndStyle
 
 extension UIWindow {
     static func makeContextWithVC(buttonCallback: SpyCallback?, titleViewButtonSpyCallback: TitleViewButtonSpyCallback?) -> SpyVC {
@@ -34,3 +35,7 @@ let anyBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: ni
 let anyView = UIView()
 let anyButton = UIButton()
 
+let anyTitleItem = UINavigationBarItemType.label(anyText)
+let anyTitleItemButton = UINavigationBarItemType.button(anyText)
+let anyOtherTitleItem = UINavigationBarItemType.label(otherText)
+let anyOtherTitleItemButton = UINavigationBarItemType.button(otherText)

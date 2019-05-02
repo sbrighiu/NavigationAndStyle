@@ -7,7 +7,6 @@ import UIKit
 
 public protocol UINavigationBarGenericItem {
     var title: String? { get }
-    var image: UIImage? { get }
     
     var isTappable: Bool { get }
     var autoDismiss: Bool { get }
@@ -15,30 +14,26 @@ public protocol UINavigationBarGenericItem {
 
 public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
-    public let image: UIImage?
     
     public let isTappable: Bool
     public let autoDismiss: Bool
     
     fileprivate init(title: String? = nil,
-                     image: UIImage? = nil,
                      isTappable: Bool,
                      autoDismiss: Bool) {
         self.title = title
-        self.image = image
-        
         self.isTappable = isTappable
         self.autoDismiss = autoDismiss
         super.init()
     }
     
     // MARK: - Factory methods
-    public static func title(_ title: String, isTappable: Bool = false, autoDismiss: Bool = false) -> UINavigationBarItemType {
-        return UINavigationBarItemType(title: title, isTappable: isTappable, autoDismiss: autoDismiss)
+    public static func label(_ title: String) -> UINavigationBarItemType {
+        return UINavigationBarItemType(title: title, isTappable: false, autoDismiss: false)
     }
-
-    public static func image(_ image: UIImage, isTappable: Bool = false, autoDismiss: Bool = false) -> UINavigationBarItemType {
-        return UINavigationBarItemType(image: image, isTappable: isTappable, autoDismiss: autoDismiss)
+    
+    public static func button(_ title: String, autoDismiss: Bool = false) -> UINavigationBarItemType {
+        return UINavigationBarItemType(title: title, isTappable: true, autoDismiss: autoDismiss)
     }
 }
 
@@ -83,12 +78,12 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
         return UIBarButtonItemType(image: image, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
     }
     
-    public static func systemItem(_ type: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style = .done, autoDismiss: Bool = false) -> UIBarButtonItemType {
+    public static func systemItem(_ type: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style = .plain, autoDismiss: Bool = false) -> UIBarButtonItemType {
         return UIBarButtonItemType(autoDismiss: autoDismiss, systemItem: type, systemStyle: systemStyle)
     }
     
     // MARK: - Internal Convenience methods
-    func contentInsets(forLeftElement isLeft: Bool) -> UIEdgeInsets {
+    internal func contentInsets(forLeftElement isLeft: Bool) -> UIEdgeInsets {
         if extendByValue != 0 {
             if isLeft {
                 return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: extendByValue)
