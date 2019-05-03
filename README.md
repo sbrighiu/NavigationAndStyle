@@ -194,7 +194,7 @@ Note: `View controller-based status bar appearance` or `UIViewControllerBasedSta
 
 ### Assets and general customization
 
-For assets included in the extension, we have 5 images included in struct `UIImage.NavigationAndStyle`:
+We have 5 assets included in the form of images in struct `UIImage.NavigationAndStyle`:
 - back icon
 - forward icon
 - settings icon
