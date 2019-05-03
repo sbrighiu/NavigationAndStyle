@@ -182,7 +182,7 @@ extension UIViewController: CanHaveColorStyle {
 
 The default value for static variable `ColorStyle.global` is `ColorStyle.default` and can be changed to allow for a different default style.
 
-### Status bar change handling
+### Status bar update handling
 
 To allow for automatic status bar update based on the ColorStyle set on UIViewController, please add the following code:
 ```
@@ -212,6 +212,10 @@ ColorStyle uses default values located in struct `ColorStyle.Defaults`, declared
 - hairlineSeparatorColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 0.13)
 - heightOfHairlineSeparator: CGFloat = 1
 - backgroundShadow = UIImage.NavigationAndStyle.backgroundShadow
+
+### More customization
+
+Every method overriden on UIViewController and UINavigationController was written in such way that if the developer needs to override it and change its behavior, they can also add the default implementation. All methods that contain default implementation end in "<name>...Action". Example: `triggerColorStyleRefresh` and `triggerColorStyleRefreshAction`
 
 ## Author
 
