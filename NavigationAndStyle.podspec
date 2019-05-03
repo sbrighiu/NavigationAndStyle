@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NavigationAndStyle'
-  s.version          = '1.0.2'
+  s.version          = '1.0.3'
   s.summary          = "Extension on UIViewController that allows the easy addition, configuration and styling of an UINavigationBar."
   
   # This description is used to generate tags and improve search results.
@@ -35,10 +35,3 @@ Pod::Spec.new do |s|
     'Resources' => ['NavigationAndStyle/**/*.{lproj,storyboard,xcdatamodeld,xib,xcassets,json}']
   }
 end
-
-# echo "5" > .swift-version
-# Check lint:   pod lib lint
-# add tag with version
-# push
-# pod trunk register smbcheeky@gmail.com
-# Push:         pod trunk push
