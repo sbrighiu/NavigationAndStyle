@@ -143,7 +143,7 @@ extension UIViewController: CanHandleVCNavigationActions {
     }
     
     @objc open func willAutomaticallyDismiss() {
-        
+        // Empty default implementation
     }
     
     public func shouldAutomaticallyDismissFor(_ navBarItemType: UINavigationBarGenericItem) -> Bool {

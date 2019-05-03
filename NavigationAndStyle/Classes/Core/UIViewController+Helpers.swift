@@ -15,14 +15,6 @@ extension UIViewController {
     }
 }
 
-extension UINavigationController {
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        setupNavigationConvenienceSettings()
-    }
-}
-
 extension UIViewController {
     
     internal func addMaskView(to superView: UIView) -> UIImageView {
