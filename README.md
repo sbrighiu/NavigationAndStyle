@@ -42,8 +42,7 @@ override func viewDidLoad() {
 
     // ...
 
-    // Always call in viewDidLoad
-    // Always call set() method to configure view controller with color style and other important UI elements (see below)
+    // Always call set() method in viewDidLoad() to configure view controller with color style and other important UI elements (see below)
     set(title: .button("Button", autoDismiss: true),
     leftItems: [.image(UIImage.NavigationAndStyle.backArrow, extendTapAreaBy: 32, autoDismiss: true)],
     rightItems: [cancelItem])
