@@ -76,7 +76,7 @@ extension UIViewController {
         let shadowView = UIImageView()
         shadowView.backgroundColor = .clear
         shadowView.contentMode = .scaleToFill
-        shadowView.image = UIImage.NavigationAndStyle.backgroundShadow
+        shadowView.image = ColorStyle.Defaults.backgroundShadow
         shadowView.tintColor = getColorStyle().shadow
         shadowView.isUserInteractionEnabled = false
         

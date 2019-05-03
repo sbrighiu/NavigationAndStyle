@@ -118,7 +118,7 @@ open class ColorStyle: NSObject {
     // MARK: - Default values for global style
     public class Defaults {
         public static var highlightAlpha: CGFloat = 0.66
-        public static func highlightColor(for color: UIColor, highlightAlpha: CGFloat = Defaults.highlightAlpha) -> UIColor {
+        internal static func highlightColor(for color: UIColor, highlightAlpha: CGFloat = Defaults.highlightAlpha) -> UIColor {
             return color.withAlphaComponent(highlightAlpha)
         }
         
@@ -128,24 +128,16 @@ open class ColorStyle: NSObject {
         
         public static var disabledColor: UIColor = .lightGray
         
-        public static var blueColor: UIColor {
-            return UIButton(frame: .zero).tintColor
-        }
+        public static var blueColor: UIColor = UIButton(frame: .zero).tintColor
         
-        public static var darkTextColor: UIColor {
-            return .darkText
-        }
+        public static var darkTextColor: UIColor = .darkText
         
-        public static var navigationBarBackgroundColor: UIColor {
-            return UIColor(red: 0.97, green: 0.97, blue: 0.97, alpha: 1)
-        }
+        public static var navigationBarBackgroundColor = UIColor(red: 0.97, green: 0.97, blue: 0.97, alpha: 1)
         
-        public static var hairlineSeparatorColor: UIColor {
-            return UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 0.13)
-        }
+        public static var hairlineSeparatorColor = UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 0.13)
         
-        public static var heightOfHairlineSeparator: CGFloat {
-            return 1
-        }
+        public static var heightOfHairlineSeparator: CGFloat = 1
+        
+        public static var backgroundShadow = UIImage.NavigationAndStyle.backgroundShadow
     }
 }
