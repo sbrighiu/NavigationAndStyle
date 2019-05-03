@@ -18,7 +18,7 @@ extension UIViewController: CanHaveColorStyle {
 
 open class ColorStyle: NSObject {
     // MARK: - Convenience styles
-    public static var global = ColorStyle()
+    public static var global = ColorStyle.default
     
     public static var `default`: ColorStyle = {
         return ColorStyle(statusBarStyle: .default,
