@@ -21,11 +21,11 @@ pod 'NavigationAndStyle'
 ## Description
 
 NavigationAndStyle is an extension on UIViewController and UINavigationController to allow for:
-- slide to back feature, even when not using the default back button used by Apple
-- fast and easy setup and customization of UINavigationBars look and content, using as less code as possible
-- minimize the need for subclassing every UIViewController to allow for these features
-- enable automatic dismissal from the titleView/barButtonItem tap, removing boilerplate code
-- instant theme switching, by simply changing the ColorStyle and calling `triggerColorStyleRefresh()`
+- slide to back feature, even when not using the default back button used by Apple.
+- fast and easy setup and customization of UINavigationBars look and content.
+- minimize the need for subclassing every UIViewController to allow for these features.
+- enable automatic dismissal from the titleView/barButtonItem tap, removing boilerplate code.
+- instant theme switching, by simply changing the ColorStyle and calling `triggerColorStyleRefresh()`.
 
 ### General usage
 
