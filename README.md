@@ -67,7 +67,7 @@ override func willAutomaticallyDismiss() {
 
 ### UINavigationBar enhancements
 
-For starters, the UINavigationBar is always set to be fully transparent, since animations of its background is not the smoothest. To fix the cases we actually need a solid background, a hairlineSeparator or even a background shadow for dynamic content, these elements are managed separately and added to the view hierarchy when the `set(...)` method is called, in viewDidLoad (recomended calling it only once :)).
+For starters, the UINavigationBar is always set to be fully transparent, since the background/titleView animation is not the smoothest. To fix cases were we need a solid background, a hairline separator or even a background shadow for dynamic content, these elements are managed separately and added to the view hierarchy when the `set(...)` method is called, in viewDidLoad (recomended calling it just once).
 
 To access these elements just call .navigationElements on the controller. This variable will always contain the custom background elements, and also the bottomAnchor of all these elements.
 ```
