@@ -152,7 +152,8 @@ class ViewController: UIViewController {
             if navigationController?.viewControllers.count == 1 {
                 return ColorStyle(statusBarStyle: .lightContent,
                                   backgroundImage: UIImage(named: "example-image")!,
-                                  backgroundMaskColor: UIColor.red.withAlphaComponent(0.5),
+                                  backgroundMaskColor: UIColor.red,
+                                  backgroundMaskAlpha: 0.7,
                                   titleColor: .white,
                                   buttonTitleColor: .white,
                                   imageTint: .white)

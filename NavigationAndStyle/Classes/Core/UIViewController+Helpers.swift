@@ -42,6 +42,7 @@ extension UIViewController {
         maskImageView.backgroundColor = colorStyle.backgroundMaskColor
         maskImageView.contentMode = .scaleAspectFill
         maskImageView.clipsToBounds = true
+        maskImageView.alpha = colorStyle.backgroundMaskAlpha
         maskImageView.image = colorStyle.backgroundMaskImage
         maskImageView.isUserInteractionEnabled = false
         

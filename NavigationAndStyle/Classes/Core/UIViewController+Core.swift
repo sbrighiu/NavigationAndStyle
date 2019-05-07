@@ -203,6 +203,9 @@ extension UIViewController {
             if maskImageView.image != colorStyle.backgroundMaskImage {
                 maskImageView.image = colorStyle.backgroundMaskImage
             }
+            if maskImageView.alpha != colorStyle.backgroundMaskAlpha {
+                maskImageView.alpha = colorStyle.backgroundMaskAlpha
+            }
         }
         
         if let hairlineView = navigationElements.hairlineSeparatorView, hairlineView.backgroundColor != colorStyle.hairlineSeparatorColor {

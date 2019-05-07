@@ -55,6 +55,7 @@ open class ColorStyle: NSObject {
     public let backgroundImage: UIImage?
     public let backgroundMaskColor: UIColor
     public let backgroundMaskImage: UIImage?
+    public let backgroundMaskAlpha: CGFloat
     public let hairlineSeparatorColor: UIColor
     public let shadow: UIColor
     
@@ -72,6 +73,7 @@ open class ColorStyle: NSObject {
                 backgroundImage: UIImage? = nil,
                 backgroundMaskColor: UIColor = .clear,
                 backgroundMaskImage: UIImage? = nil,
+                backgroundMaskAlpha: CGFloat = 1.0,
                 hairlineSeparatorColor: UIColor = .clear,
                 shadow: UIColor = .clear,
                 titleFont: UIFont = Defaults.titleFont,
@@ -87,6 +89,17 @@ open class ColorStyle: NSObject {
         self.backgroundImage = backgroundImage
         self.backgroundMaskColor = backgroundMaskColor
         self.backgroundMaskImage = backgroundMaskImage
+        
+        if backgroundMaskAlpha > 1 {
+            logFrameworkWarning("Alpha value set is bigger than 1. Please fix backgroundMaskAlpha value.")
+            self.backgroundMaskAlpha = 1
+        } else if backgroundMaskAlpha < 0 {
+            logFrameworkWarning("Alpha value set is smaller than 0. Please fix backgroundMaskAlpha value.")
+            self.backgroundMaskAlpha = 0
+        } else {
+            self.backgroundMaskAlpha = backgroundMaskAlpha
+        }
+        
         self.shadow = shadow
         self.hairlineSeparatorColor = hairlineSeparatorColor
     
@@ -107,6 +120,7 @@ open class ColorStyle: NSObject {
                 backgroundImage: UIImage? = Defaults.nullImage,
                 backgroundMaskColor: UIColor? = nil,
                 backgroundMaskImage: UIImage? = Defaults.nullImage,
+                backgroundMaskAlpha: CGFloat? = nil,
                 hairlineSeparatorColor: UIColor? = nil,
                 shadow: UIColor? = nil,
                 titleFont: UIFont? = nil,
@@ -121,6 +135,7 @@ open class ColorStyle: NSObject {
                           backgroundImage: backgroundImage !== Defaults.nullImage ? backgroundImage : self.backgroundImage,
                           backgroundMaskColor: backgroundMaskColor ?? self.backgroundMaskColor,
                           backgroundMaskImage: backgroundMaskImage !== Defaults.nullImage ? backgroundMaskImage : self.backgroundMaskImage,
+                          backgroundMaskAlpha: backgroundMaskAlpha ?? self.backgroundMaskAlpha,
                           hairlineSeparatorColor: hairlineSeparatorColor ?? self.hairlineSeparatorColor,
                           shadow: shadow ?? self.shadow,
                           titleFont: titleFont ?? self.titleFont,
