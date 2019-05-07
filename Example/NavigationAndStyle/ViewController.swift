@@ -143,15 +143,23 @@ class ViewController: UIViewController {
                                               imageTint: .white)
             } else {
                 return ColorStyle(statusBarStyle: .default,
-                                  background: .white,
+                                  backgroundColor: .white,
                                   titleColor: .black,
                                   buttonTitleColor: .black,
                                   imageTint: .black)
             }
         } else {
-            if navigationController?.viewControllers.count == 2 {
+            if navigationController?.viewControllers.count == 1 {
                 return ColorStyle(statusBarStyle: .lightContent,
-                                  background: .red,
+                                  backgroundImage: UIImage(named: "example-image")!,
+                                  backgroundMaskColor: UIColor.red.withAlphaComponent(0.5),
+                                  titleColor: .white,
+                                  buttonTitleColor: .white,
+                                  imageTint: .white)
+                
+            } else if navigationController?.viewControllers.count == 2 {
+                return ColorStyle(statusBarStyle: .lightContent,
+                                  backgroundColor: .red,
                                   titleColor: .white,
                                   buttonTitleColor: .white,
                                   imageTint: .white)
@@ -165,7 +173,7 @@ class ViewController: UIViewController {
                 
             } else if navigationController?.viewControllers.count == 4 {
                 return ColorStyle(statusBarStyle: .lightContent,
-                                  background: .black,
+                                  backgroundColor: .black,
                                   titleColor: .white,
                                   buttonTitleColor: .white,
                                   imageTint: .white)

@@ -22,17 +22,8 @@ open class ColorStyle: NSObject {
     
     public static var `default`: ColorStyle = {
         return ColorStyle(statusBarStyle: .default,
-                          background: Defaults.navigationBarBackgroundColor,
-                          backgroundImage: nil,
-                          hairlineSeparatorColor: Defaults.hairlineSeparatorColor,
-                          shadow: .clear,
-                          titleFont: Defaults.titleFont,
-                          titleColor: Defaults.darkTextColor,
-                          buttonFont: Defaults.buttonFont,
-                          buttonTitleColor: Defaults.blueColor,
-                          imageTint: Defaults.blueColor,
-                          highlightAlpha: Defaults.highlightAlpha,
-                          disabledColor: Defaults.disabledColor)
+                          backgroundColor: Defaults.navigationBarBackgroundColor,
+                          hairlineSeparatorColor: Defaults.hairlineSeparatorColor)
     }()
     
     public static func transparent(statusBarStyle: UIStatusBarStyle = .default,
@@ -45,8 +36,7 @@ open class ColorStyle: NSObject {
                                    highlightAlpha: CGFloat = Defaults.highlightAlpha,
                                    disabledColor: UIColor = Defaults.disabledColor) -> ColorStyle {
         return ColorStyle(statusBarStyle: statusBarStyle,
-                          background: .clear,
-                          backgroundImage: nil,
+                          backgroundColor: .clear,
                           hairlineSeparatorColor: .clear,
                           shadow: shadow,
                           titleFont: titleFont,
@@ -61,8 +51,10 @@ open class ColorStyle: NSObject {
     // MARK: - Implementation
     public let statusBarStyle: UIStatusBarStyle
     
-    public let background: UIColor
+    public let backgroundColor: UIColor
     public let backgroundImage: UIImage?
+    public let backgroundMaskColor: UIColor
+    public let backgroundMaskImage: UIImage?
     public let hairlineSeparatorColor: UIColor
     public let shadow: UIColor
     
@@ -70,14 +62,16 @@ open class ColorStyle: NSObject {
     public let titleColor: UIColor
     public let buttonFont: UIFont
     public let buttonTitleColor: UIColor
-    public let imageTint: UIColor?
+    public let imageTint: UIColor
     
     public let highlightAlpha: CGFloat
     public let disabledColor: UIColor
     
     public init(statusBarStyle: UIStatusBarStyle = .default,
-                background: UIColor = Defaults.navigationBarBackgroundColor,
+                backgroundColor: UIColor = Defaults.navigationBarBackgroundColor,
                 backgroundImage: UIImage? = nil,
+                backgroundMaskColor: UIColor = .clear,
+                backgroundMaskImage: UIImage? = nil,
                 hairlineSeparatorColor: UIColor = .clear,
                 shadow: UIColor = .clear,
                 titleFont: UIFont = Defaults.titleFont,
@@ -89,8 +83,10 @@ open class ColorStyle: NSObject {
                 disabledColor: UIColor = Defaults.disabledColor) {
         self.statusBarStyle = statusBarStyle
         
-        self.background = background
+        self.backgroundColor = backgroundColor
         self.backgroundImage = backgroundImage
+        self.backgroundMaskColor = backgroundMaskColor
+        self.backgroundMaskImage = backgroundMaskImage
         self.shadow = shadow
         self.hairlineSeparatorColor = hairlineSeparatorColor
     
@@ -107,27 +103,31 @@ open class ColorStyle: NSObject {
     }
     
     public func new(statusBarStyle: UIStatusBarStyle? = nil,
-                background: UIColor? = nil,
-                backgroundImage: UIImage?,
+                backgroundColor: UIColor? = nil,
+                backgroundImage: UIImage? = Defaults.nullImage,
+                backgroundMaskColor: UIColor? = nil,
+                backgroundMaskImage: UIImage? = Defaults.nullImage,
                 hairlineSeparatorColor: UIColor? = nil,
                 shadow: UIColor? = nil,
                 titleFont: UIFont? = nil,
                 titleColor: UIColor? = nil,
                 buttonFont: UIFont? = nil,
                 buttonTitleColor: UIColor? = nil,
-                imageTint: UIColor? = nil,
+                imageTint: UIColor = Defaults.nullColor,
                 highlightAlpha: CGFloat? = nil,
                 disabledColor: UIColor? = nil) -> ColorStyle {
         return ColorStyle(statusBarStyle: statusBarStyle ?? self.statusBarStyle,
-                          background: background ?? self.background,
-                          backgroundImage: backgroundImage,
+                          backgroundColor: backgroundColor ?? self.backgroundColor,
+                          backgroundImage: backgroundImage !== Defaults.nullImage ? backgroundImage : self.backgroundImage,
+                          backgroundMaskColor: backgroundMaskColor ?? self.backgroundMaskColor,
+                          backgroundMaskImage: backgroundMaskImage !== Defaults.nullImage ? backgroundMaskImage : self.backgroundMaskImage,
                           hairlineSeparatorColor: hairlineSeparatorColor ?? self.hairlineSeparatorColor,
                           shadow: shadow ?? self.shadow,
                           titleFont: titleFont ?? self.titleFont,
                           titleColor: titleColor ?? self.titleColor,
                           buttonFont: buttonFont ?? self.buttonFont,
                           buttonTitleColor: buttonTitleColor ?? self.buttonTitleColor,
-                          imageTint: imageTint ?? self.imageTint ?? Defaults.blueColor,
+                          imageTint: imageTint !== Defaults.nullColor ? imageTint : self.imageTint,
                           highlightAlpha: highlightAlpha ?? self.highlightAlpha,
                           disabledColor: disabledColor ?? self.disabledColor)
     }
@@ -165,5 +165,8 @@ open class ColorStyle: NSObject {
         public static var heightOfHairlineSeparator: CGFloat = 1
         
         public static var backgroundShadow = UIImage.NavigationAndStyle.backgroundShadow
+        
+        public static let nullImage = UIImage()
+        public static let nullColor = UIColor()
     }
 }

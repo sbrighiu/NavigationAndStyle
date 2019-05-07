@@ -37,7 +37,7 @@ class Tests: XCTestCase {
     // MARK: - Setup test case
     override func setUp() {
         ColorStyle.global = ColorStyle(statusBarStyle: .default,
-                                       background: .clear,
+                                       backgroundColor: .clear,
                                        shadow: .black,
                                        titleColor: .white,
                                        buttonTitleColor: .white,

@@ -187,12 +187,21 @@ extension UIViewController {
     
     internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ColorStyle) {
         // Setup background using the mask
-        if let maskView = navigationElements.backgroundImageView {
-            if maskView.backgroundColor != colorStyle.background {
-                maskView.backgroundColor = colorStyle.background
+        if let backgroundImageView = navigationElements.backgroundImageView {
+            if backgroundImageView.backgroundColor != colorStyle.backgroundColor {
+                backgroundImageView.backgroundColor = colorStyle.backgroundColor
             }
-            if maskView.image != colorStyle.backgroundImage {
-                maskView.image = colorStyle.backgroundImage
+            if backgroundImageView.image != colorStyle.backgroundImage {
+                backgroundImageView.image = colorStyle.backgroundImage
+            }
+        }
+        
+        if let maskImageView = navigationElements.backgroundMaskImageView {
+            if maskImageView.backgroundColor != colorStyle.backgroundMaskColor {
+                maskImageView.backgroundColor = colorStyle.backgroundMaskColor
+            }
+            if maskImageView.image != colorStyle.backgroundMaskImage {
+                maskImageView.image = colorStyle.backgroundMaskImage
             }
         }
         

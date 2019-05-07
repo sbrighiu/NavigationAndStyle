@@ -149,8 +149,10 @@ Using different ColorStyles for all UIViewControllers, the Example project shows
 It can be initialised using the init method (check Defaults struct below for more details)
 ```
 init(statusBarStyle: UIStatusBarStyle = .default,
-     background: UIColor = Defaults.navigationBarBackgroundColor,
+     backgroundColor: UIColor = Defaults.navigationBarBackgroundColor,
      backgroundImage: UIImage? = nil,
+     backgroundMaskColor: UIColor = .clear,
+     backgroundMaskImage: UIImage? = nil,
      hairlineSeparatorColor: UIColor = .clear,
      shadow: UIColor = .clear,
      titleFont: UIFont = Defaults.titleFont,

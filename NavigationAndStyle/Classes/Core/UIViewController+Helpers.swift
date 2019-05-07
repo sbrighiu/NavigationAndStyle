@@ -17,29 +17,49 @@ extension UIViewController {
 
 extension UIViewController {
     
-    internal func addMaskView(to superView: UIView) -> UIImageView {
+    internal func addBackgroundAndMaskView(to superView: UIView) -> (UIImageView, UIImageView) {
         let colorStyle = getColorStyle()
         
-        let maskView = UIImageView(frame: .zero)
-        maskView.backgroundColor = colorStyle.background
-        maskView.contentMode = .scaleAspectFill
-        maskView.image = colorStyle.backgroundImage
-        maskView.isUserInteractionEnabled = false
+        let backgroundImageView = UIImageView(frame: .zero)
+        backgroundImageView.backgroundColor = colorStyle.backgroundColor
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.clipsToBounds = true
+        backgroundImageView.image = colorStyle.backgroundImage
+        backgroundImageView.isUserInteractionEnabled = false
         
-        navigationElements.backgroundImageView = maskView
+        navigationElements.backgroundImageView = backgroundImageView
         
-        superView.insertSubview(maskView, at: 0)
-        maskView.translatesAutoresizingMaskIntoConstraints = false
+        superView.insertSubview(backgroundImageView, at: 0)
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            maskView.topAnchor.constraint(equalTo: superView.topAnchor),
-            maskView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
-            maskView.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
+            backgroundImageView.topAnchor.constraint(equalTo: superView.topAnchor),
+            backgroundImageView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
             ])
         
-        addHairlineSeparator(superView, maskView)
+        let maskImageView = UIImageView(frame: .zero)
+        maskImageView.backgroundColor = colorStyle.backgroundMaskColor
+        maskImageView.contentMode = .scaleAspectFill
+        maskImageView.clipsToBounds = true
+        maskImageView.image = colorStyle.backgroundMaskImage
+        maskImageView.isUserInteractionEnabled = false
         
-        return maskView
+        navigationElements.backgroundMaskImageView = maskImageView
+        
+        superView.insertSubview(maskImageView, aboveSubview: backgroundImageView)
+        maskImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            maskImageView.topAnchor.constraint(equalTo: backgroundImageView.topAnchor),
+            maskImageView.leadingAnchor.constraint(equalTo: backgroundImageView.leadingAnchor),
+            maskImageView.trailingAnchor.constraint(equalTo: backgroundImageView.trailingAnchor),
+            maskImageView.bottomAnchor.constraint(equalTo: backgroundImageView.bottomAnchor)
+            ])
+        
+        addHairlineSeparator(superView, maskImageView)
+        
+        return (backgroundImageView, maskImageView)
     }
     
     internal func addHairlineSeparator(_ superView: UIView, _ maskView: UIImageView) {
@@ -47,6 +67,7 @@ extension UIViewController {
         
         let hairlineView = UIView(frame: .zero)
         hairlineView.contentMode = .scaleAspectFill
+        hairlineView.clipsToBounds = true
         hairlineView.isUserInteractionEnabled = false
         
         hairlineView.backgroundColor = hairlineSeparatorColor
@@ -68,6 +89,7 @@ extension UIViewController {
         let shadowView = UIImageView()
         shadowView.backgroundColor = .clear
         shadowView.contentMode = .scaleToFill
+        shadowView.clipsToBounds = true
         shadowView.image = ColorStyle.Defaults.backgroundShadow
         shadowView.tintColor = getColorStyle().shadow
         shadowView.isUserInteractionEnabled = false
@@ -89,8 +111,8 @@ extension UIViewController {
     internal func addNavigationBarComplementElements(of navC: UINavigationController) {
         navigationElements.removeFromSuperview()
         
-        let maskView = addMaskView(to: self.view)
-        maskView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+        let (backgroundImageView, _) = addBackgroundAndMaskView(to: self.view)
+        backgroundImageView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         
         let shadowView = addShadowView(to: self.view)
         shadowView?.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: Constants.recommendedItemHeight).isActive = true
@@ -99,7 +121,7 @@ extension UIViewController {
     internal func addOverlayNavigationBarElements(to superView: UIView) {
         navigationElements.removeFromSuperview()
         
-        let maskView = addMaskView(to: superView)
+        let (backgroundImageView, maskView) = addBackgroundAndMaskView(to: superView)
         let shadowView = addShadowView(to: superView)
         
         let navBar = UINavigationBar()
@@ -119,7 +141,7 @@ extension UIViewController {
         
         shadowView?.bottomAnchor.constraint(equalTo: navBar.bottomAnchor, constant: Constants.shadowExtraHeight).isActive = true
         
-        maskView.bottomAnchor.constraint(equalTo: navBar.bottomAnchor).isActive = true
+        backgroundImageView.bottomAnchor.constraint(equalTo: navBar.bottomAnchor).isActive = true
     }
 }
 
@@ -153,6 +175,7 @@ private var models = [Int: NavigationVCModel]()
 public class NavigationVCModel {
     public weak var modalNavigationBar: UINavigationBar?
     public weak var backgroundImageView: UIImageView?
+    public weak var backgroundMaskImageView: UIImageView?
     public weak var hairlineSeparatorView: UIView?
     public weak var shadowBackgroundView: UIImageView?
     
@@ -166,6 +189,7 @@ public class NavigationVCModel {
     internal func removeFromSuperview() {
         modalNavigationBar?.removeFromSuperview()
         backgroundImageView?.removeFromSuperview()
+        backgroundMaskImageView?.removeFromSuperview()
         hairlineSeparatorView?.removeFromSuperview()
         shadowBackgroundView?.removeFromSuperview()
     }
