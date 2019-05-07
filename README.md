@@ -163,7 +163,7 @@ init(statusBarStyle: UIStatusBarStyle = .default,
 ```
 , or by using the convenience variables `ColorStyle.default` (as close to the default Apple look as possible) and `ColorStyle.transparent` (trimmed down version of the init method).
 
-To quickly create another ColorStyle from a current one, user the convenince instance method `.new(...)`.
+To quickly create another ColorStyle from a current one, use the convenince instance method `.new(...)`.
 
 A personalised ColorStyle can be set directly on the UINavigationController or on each UIViewController.
 This is done by adding the follwing code into the UIViewController/UINavigationController of your choice:
