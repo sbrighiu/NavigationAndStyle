@@ -46,7 +46,7 @@ class Tests: XCTestCase {
     
     // MARK: - Test setup
     func test_setupNotCalled() {
-        ColorStyle.global = ColorStyle.transparent()
+        ColorStyle.global = ColorStyle.transparent().new(backgroundImage: nil)
         
         makeSUT()
         XCTAssertFalse(rootVC.didSetupCustomNavigationAndStyle)

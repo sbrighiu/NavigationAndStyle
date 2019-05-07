@@ -106,6 +106,32 @@ open class ColorStyle: NSObject {
         super.init()
     }
     
+    public func new(statusBarStyle: UIStatusBarStyle? = nil,
+                background: UIColor? = nil,
+                backgroundImage: UIImage?,
+                hairlineSeparatorColor: UIColor? = nil,
+                shadow: UIColor? = nil,
+                titleFont: UIFont? = nil,
+                titleColor: UIColor? = nil,
+                buttonFont: UIFont? = nil,
+                buttonTitleColor: UIColor? = nil,
+                imageTint: UIColor? = nil,
+                highlightAlpha: CGFloat? = nil,
+                disabledColor: UIColor? = nil) -> ColorStyle {
+        return ColorStyle(statusBarStyle: statusBarStyle ?? self.statusBarStyle,
+                          background: background ?? self.background,
+                          backgroundImage: backgroundImage,
+                          hairlineSeparatorColor: hairlineSeparatorColor ?? self.hairlineSeparatorColor,
+                          shadow: shadow ?? self.shadow,
+                          titleFont: titleFont ?? self.titleFont,
+                          titleColor: titleColor ?? self.titleColor,
+                          buttonFont: buttonFont ?? self.buttonFont,
+                          buttonTitleColor: buttonTitleColor ?? self.buttonTitleColor,
+                          imageTint: imageTint ?? self.imageTint ?? Defaults.blueColor,
+                          highlightAlpha: highlightAlpha ?? self.highlightAlpha,
+                          disabledColor: disabledColor ?? self.disabledColor)
+    }
+    
     // MARK: Convenience methods
     public var barStyle: UIBarStyle {
         return statusBarStyle == .default ? .default : .black
