@@ -44,10 +44,7 @@ extension UIButton {
         var font: UIFont
         var color: UIColor
         if let isLeft = isLeft, let type = barItemType {
-            if let image = type.image {
-                self.setImage(image, for: .normal)
-                self.imageView?.configure(with: colorStyle)
-                
+            if let _ = type.image {
                 shouldAddExtraSpace = true
             }
             self.contentEdgeInsets = type.contentInsets(forLeftElement: isLeft)
@@ -62,6 +59,11 @@ extension UIButton {
         } else {
             logFrameworkError("Button was not configured properly.")
             return self
+        }
+        
+        if let image = genericType.image {
+            self.setImage(image, for: .normal)
+            self.imageView?.configure(with: colorStyle)
         }
         
         var firstLine: String

@@ -7,6 +7,7 @@ import UIKit
 
 public protocol UINavigationBarGenericItem {
     var title: String? { get }
+    var image: UIImage? { get }
     var secondLineAttributes: [NSAttributedString.Key : Any]? { get }
     
     var isTappable: Bool { get }
@@ -15,16 +16,19 @@ public protocol UINavigationBarGenericItem {
 
 public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
+    public let image: UIImage?
     public let secondLineAttributes: [NSAttributedString.Key : Any]?
     
     public let isTappable: Bool
     public let autoDismiss: Bool
     
     fileprivate init(title: String? = nil,
+                     image: UIImage? = nil,
                      secondLineAttributes: [NSAttributedString.Key : Any]? = nil,
                      isTappable: Bool,
                      autoDismiss: Bool) {
         self.title = title
+        self.image = image
         self.secondLineAttributes = secondLineAttributes
         
         self.isTappable = isTappable
@@ -44,8 +48,8 @@ public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
 
 public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
-    public let secondLineAttributes: [NSAttributedString.Key : Any]?
     public let image: UIImage?
+    public let secondLineAttributes: [NSAttributedString.Key : Any]?
     
     public let systemItem: UIBarButtonItem.SystemItem?
     public let systemStyle: UIBarButtonItem.Style?
