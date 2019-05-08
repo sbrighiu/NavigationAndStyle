@@ -124,8 +124,8 @@ class Tests: XCTestCase {
     func test_multipleLeftButtons() {
         makeSUT()
         rootVC.set(title: anyTitleItem,
-                   leftItems: [UIBarButtonItemType.title(anyText, extendTapAreaBy: 8),
-                               UIBarButtonItemType.title(otherText)])
+                   leftItems: [.titleAndImage(NSLocalizedString("Back\nto the future", comment: ""), image: UIImage.NavigationAndStyle.backArrow, secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)], autoDismiss: true),
+                               .title(anyText, extendTapAreaBy: 8)])
         
         XCTAssert(rootVC.navigationItem.leftBarButtonItems!.count == 2)
     }
@@ -153,7 +153,7 @@ class Tests: XCTestCase {
         
         var temp = rootVC.navigationItem.titleView as! UIButton
         
-        rootVC.change(title: anyTitleItem)
+        rootVC.change(title: UINavigationBarItemType.label("Something\nSomething", secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)]))
         
         XCTAssert((rootVC.navigationItem.titleView as! UIButton) !== temp)
         temp = rootVC.navigationItem.titleView as! UIButton
