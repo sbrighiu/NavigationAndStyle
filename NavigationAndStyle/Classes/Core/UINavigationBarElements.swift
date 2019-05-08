@@ -17,6 +17,7 @@ public protocol UINavigationBarGenericItem {
 public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
     public let image: UIImage?
+    
     public let secondLineAttributes: [NSAttributedString.Key : Any]?
     
     public let isTappable: Bool
@@ -29,6 +30,7 @@ public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
                      autoDismiss: Bool) {
         self.title = title
         self.image = image
+        
         self.secondLineAttributes = secondLineAttributes
         
         self.isTappable = isTappable
@@ -44,11 +46,20 @@ public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     public static func button(_ title: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil, autoDismiss: Bool = false) -> UINavigationBarItemType {
         return UINavigationBarItemType(title: title, secondLineAttributes: secondLineAttributes, isTappable: true, autoDismiss: autoDismiss)
     }
+    
+    public static func imageView(_ image: UIImage, isTappable: Bool = false, autoDismiss: Bool = false) -> UINavigationBarItemType {
+        return UINavigationBarItemType(image: image, isTappable: isTappable, autoDismiss: autoDismiss)
+    }
+    
+    public static var empty: UINavigationBarItemType = {
+        return .label("")
+    }()
 }
 
 public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
     public let image: UIImage?
+    
     public let secondLineAttributes: [NSAttributedString.Key : Any]?
     
     public let systemItem: UIBarButtonItem.SystemItem?
@@ -67,7 +78,9 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
                  extendTapAreaBy extendByValue: CGFloat = 0) {
         self.title = title
         self.image = image
+        
         self.secondLineAttributes = secondLineAttributes
+        
         self.systemItem = systemItem
         self.systemStyle = systemStyle
         

@@ -71,8 +71,10 @@ extension UIViewController: NavigationVC {
         
         if let _ = type.title {
             addButtonTitleView(with: type)
+        } else if let _ = type.image {
+            addTitleImageView(with: type)
         } else {
-            logFrameworkError("this type was not treated")
+            logFrameworkError("This UINavigationBarItemType was not treated")
         }
     }
     

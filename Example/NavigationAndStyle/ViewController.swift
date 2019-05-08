@@ -54,6 +54,12 @@ private extension UINavigationBarItemType {
         static var twoRowButton: UINavigationBarItemType = {
             return UINavigationBarItemType.button("Dismiss\nTap me", secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)], autoDismiss: true)
         }()
+        static var imageView: UINavigationBarItemType = {
+            return UINavigationBarItemType.imageView(UIImage(named: "yin-yang")!, autoDismiss: true)
+        }()
+        static var imageViewButton: UINavigationBarItemType = {
+            return UINavigationBarItemType.imageView(UIImage(named: "yin-yang")!, isTappable: true, autoDismiss: true)
+        }()
     }
 }
 
@@ -89,6 +95,16 @@ class ViewController: UIViewController {
             } else if navC.viewControllers.count == 2 {
                 set(title: UINavigationBarItemType.middle.button,
                     leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
+                    rightItems: [UIBarButtonItemType.right.cancel])
+                
+            } else if navC.viewControllers.count == 3 {
+                set(title: UINavigationBarItemType.middle.imageView,
+                    leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
+                    rightItems: [UIBarButtonItemType.right.cancel])
+                
+            } else if navC.viewControllers.count == 4 {
+                set(title: UINavigationBarItemType.middle.imageViewButton,
+                    leftItems: [UIBarButtonItemType.left.backWithText],
                     rightItems: [UIBarButtonItemType.right.cancel])
                 
             } else {

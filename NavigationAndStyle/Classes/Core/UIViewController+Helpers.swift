@@ -168,6 +168,22 @@ extension UIViewController {
         
         getNavigationItem().titleView = button
     }
+    
+    internal func addTitleImageView(with type: UINavigationBarItemType) {
+        var target: Any?
+        var selector: Selector?
+        if type.isTappable {
+            target = self
+            selector = #selector(pressedNavTitle)
+        }
+        
+        let imageView = UIImageView.build(with: type,
+                                          target: target,
+                                          action: selector,
+                                          and: getColorStyle())
+        
+        getNavigationItem().titleView = imageView
+    }
 }
 
 // MARK: - NavigationElementsModel management

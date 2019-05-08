@@ -158,9 +158,9 @@ class Tests: XCTestCase {
         XCTAssert((rootVC.navigationItem.titleView as! UIButton) !== temp)
         temp = rootVC.navigationItem.titleView as! UIButton
         
-        rootVC.set(title: anyTitleItem)
+        rootVC.set(title: .imageView(anyImage))
         
-        XCTAssert((rootVC.navigationItem.titleView as! UIButton) !== temp)
+        XCTAssert(rootVC.navigationItem.titleView !== temp)
     }
     
     func test_replaceRightItems() {
@@ -216,7 +216,7 @@ class Tests: XCTestCase {
         }
         makeSUT(callback: callback)
         
-        rootVC.set(title: anyTitleItem, leftItems: [barItemLeftType1, barItemLeftType2], rightItems: [barItemRightType])
+        rootVC.set(title: .empty, leftItems: [barItemLeftType1, barItemLeftType2], rightItems: [barItemRightType])
         
         XCTAssert(rootVC.leftButtons.count == 2)
         XCTAssert(rootVC.rightButtons.count == 1)
@@ -245,6 +245,32 @@ class Tests: XCTestCase {
         
         XCTAssert(rootVC.leftButtons.count == 0)
         XCTAssert(rootVC.rightButtons.count == 0)
+        
+        rootVC.perform(#selector(rootVC.pressedNavTitle), with: nil)
+        
+        waitForExpectations(timeout: 1.0, handler: nil)
+        
+        XCTAssert(foundType === type)
+    }
+    
+    func test_titleImageViewActions() {
+        var foundType: UINavigationBarItemType?
+        
+        let exp = expectation(description: "waiting")
+        exp.expectedFulfillmentCount = 1
+        let titleViewSpyCallback: TitleViewButtonSpyCallback = { (type) in
+            exp.fulfill()
+            
+            foundType = type
+        }
+        makeSUT(titleViewSpyCallback: titleViewSpyCallback)
+        
+        let type = UINavigationBarItemType.imageView(anyImage, isTappable: true, autoDismiss: false)
+        rootVC.set(title: type)
+        
+        XCTAssert(rootVC.leftButtons.count == 0)
+        XCTAssert(rootVC.rightButtons.count == 0)
+        XCTAssert(rootVC.navigationItem.titleView!.gestureRecognizers!.count == 1)
         
         rootVC.perform(#selector(rootVC.pressedNavTitle), with: nil)
         
