@@ -16,6 +16,9 @@ private extension UIBarButtonItemType {
         static let backWithText: UIBarButtonItemType = {
             return .titleAndImage(NSLocalizedString("Back", comment: ""), image: UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
         }()
+        static let backWithTwoLinesText: UIBarButtonItemType = {
+            return .titleAndImage(NSLocalizedString("Back\nto the future", comment: ""), image: UIImage.NavigationAndStyle.backArrow, secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)], autoDismiss: true)
+        }()
         static let settings: UIBarButtonItemType = {
             return .image(UIImage.NavigationAndStyle.settings, extendTapAreaBy: 24)
         }()
@@ -40,10 +43,16 @@ private extension UIBarButtonItemType {
 private extension UINavigationBarItemType {
     struct middle {
         static var label: UINavigationBarItemType = {
-            return UINavigationBarItemType.label("Label")
+            return UINavigationBarItemType.label("Something")
+        }()
+        static var twoRowLabel: UINavigationBarItemType = {
+            return UINavigationBarItemType.label("Something\nSomething", secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)])
         }()
         static var button: UINavigationBarItemType = {
-            return UINavigationBarItemType.button("Button", autoDismiss: true)
+            return UINavigationBarItemType.button("Dismiss", autoDismiss: true)
+        }()
+        static var twoRowButton: UINavigationBarItemType = {
+            return UINavigationBarItemType.button("Dismiss\nTap me", secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)], autoDismiss: true)
         }()
     }
 }
@@ -65,7 +74,7 @@ class ViewController: UIViewController {
         
         if let navC = self.navigationController {
             if UIApplication.shared.delegate?.window??.rootViewController != self.navigationController {
-                set(title: UINavigationBarItemType.middle.button,
+                set(title: UINavigationBarItemType.middle.twoRowButton,
                     rightItems: [UIBarButtonItemType.right.dismiss,
                                  UIBarButtonItemType.right.temp])
                 
@@ -74,12 +83,12 @@ class ViewController: UIViewController {
                                               UIBarButtonItemType.right.dismiss])
                 }
             } else if navC.viewControllers.count == 1 {
-                set(title: UINavigationBarItemType.middle.label,
+                set(title: UINavigationBarItemType.middle.twoRowLabel,
                     leftItems: [UIBarButtonItemType.left.settings])
                 
             } else if navC.viewControllers.count == 2 {
                 set(title: UINavigationBarItemType.middle.button,
-                    leftItems: [UIBarButtonItemType.left.back],
+                    leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
                     rightItems: [UIBarButtonItemType.right.cancel])
                 
             } else {

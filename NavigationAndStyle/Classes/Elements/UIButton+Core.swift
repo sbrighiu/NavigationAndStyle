@@ -38,8 +38,9 @@ extension UIButton {
     @discardableResult internal func configure(with colorStyle: ColorStyle, isLeft: Bool?) -> UIButton {
         guard let genericType = genericItemType else { return self }
         
-        var targetTitle = genericType.title ?? ""
+        let targetTitle = genericType.title ?? ""
         
+        var shouldAddExtraSpace: Bool = false
         var font: UIFont
         var color: UIColor
         if let isLeft = isLeft, let type = barItemType {
@@ -47,7 +48,7 @@ extension UIButton {
                 self.setImage(image, for: .normal)
                 self.imageView?.configure(with: colorStyle)
                 
-                targetTitle.insert(" ", at: targetTitle.startIndex)
+                shouldAddExtraSpace = true
             }
             self.contentEdgeInsets = type.contentInsets(forLeftElement: isLeft)
             
@@ -63,12 +64,60 @@ extension UIButton {
             return self
         }
         
+        var firstLine: String
+        var secondLine: String
+        if let endlineIndex = targetTitle.firstIndex(of: "\n") {
+            let afterIndex = targetTitle.index(after: endlineIndex)
+            firstLine = String(targetTitle.prefix(upTo: afterIndex))
+            secondLine = String(targetTitle.suffix(from: afterIndex))
+        } else {
+            firstLine = targetTitle
+            secondLine = ""
+        }
+        
+        if !secondLine.isEmpty {
+            self.titleLabel?.numberOfLines = 2
+        }
+        
+        if let isLeft = isLeft {
+            self.titleLabel?.textAlignment = isLeft ? .left : .right
+        } else {
+            self.titleLabel?.textAlignment = .center
+        }
+        
+        if shouldAddExtraSpace {
+            firstLine.insert(" ", at: targetTitle.startIndex)
+            secondLine.insert(" ", at: targetTitle.startIndex)
+        }
+        
         self.tintColor = color
-        self.setTitle(targetTitle, for: .normal)
-        self.titleLabel?.font = font
-        self.setTitleColor(color, for: .normal)
-        self.setTitleColor(colorStyle.disabledColor, for: .disabled)
-        self.setTitleColor(colorStyle.highlightColor(for: color), for: .highlighted)
+        
+        for (state, color) in [
+            (UIControl.State.normal, color),
+            (.disabled, colorStyle.disabledColor),
+            (.highlighted, colorStyle.highlightColor(for: color))
+            ] {
+                let firstLineAttr = [NSAttributedString.Key.font: font,
+                                     NSAttributedString.Key.foregroundColor: color]
+                
+                var secondLineAttr: [NSAttributedString.Key : Any]
+                if var attr = genericType.secondLineAttributes {
+                    if attr[NSAttributedString.Key.font] == nil {
+                        attr[NSAttributedString.Key.font] = font
+                    }
+                    if attr[NSAttributedString.Key.foregroundColor] == nil {
+                        attr[NSAttributedString.Key.foregroundColor] = color
+                    }
+                    secondLineAttr = attr
+                } else {
+                    secondLineAttr = firstLineAttr
+                }
+                
+                let attrText = NSMutableAttributedString(string: firstLine, attributes: firstLineAttr)
+                attrText.append(NSAttributedString(string: secondLine, attributes: secondLineAttr))
+                
+                self.setAttributedTitle(attrText, for: state)
+        }
         
         return self
     }

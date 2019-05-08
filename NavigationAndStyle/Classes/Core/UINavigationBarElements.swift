@@ -7,6 +7,7 @@ import UIKit
 
 public protocol UINavigationBarGenericItem {
     var title: String? { get }
+    var secondLineAttributes: [NSAttributedString.Key : Any]? { get }
     
     var isTappable: Bool { get }
     var autoDismiss: Bool { get }
@@ -14,31 +15,36 @@ public protocol UINavigationBarGenericItem {
 
 public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
+    public let secondLineAttributes: [NSAttributedString.Key : Any]?
     
     public let isTappable: Bool
     public let autoDismiss: Bool
     
     fileprivate init(title: String? = nil,
+                     secondLineAttributes: [NSAttributedString.Key : Any]? = nil,
                      isTappable: Bool,
                      autoDismiss: Bool) {
         self.title = title
+        self.secondLineAttributes = secondLineAttributes
+        
         self.isTappable = isTappable
         self.autoDismiss = autoDismiss
         super.init()
     }
     
     // MARK: - Factory methods
-    public static func label(_ title: String) -> UINavigationBarItemType {
-        return UINavigationBarItemType(title: title, isTappable: false, autoDismiss: false)
+    public static func label(_ title: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil) -> UINavigationBarItemType {
+        return UINavigationBarItemType(title: title, secondLineAttributes: secondLineAttributes, isTappable: false, autoDismiss: false)
     }
     
-    public static func button(_ title: String, autoDismiss: Bool = false) -> UINavigationBarItemType {
-        return UINavigationBarItemType(title: title, isTappable: true, autoDismiss: autoDismiss)
+    public static func button(_ title: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil, autoDismiss: Bool = false) -> UINavigationBarItemType {
+        return UINavigationBarItemType(title: title, secondLineAttributes: secondLineAttributes, isTappable: true, autoDismiss: autoDismiss)
     }
 }
 
 public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
+    public let secondLineAttributes: [NSAttributedString.Key : Any]?
     public let image: UIImage?
     
     public let systemItem: UIBarButtonItem.SystemItem?
@@ -50,12 +56,14 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
     
     private init(title: String? = nil,
                  image: UIImage? = nil,
+                 secondLineAttributes: [NSAttributedString.Key : Any]? = nil,
                  autoDismiss: Bool = false,
                  systemItem: UIBarButtonItem.SystemItem? = nil,
                  systemStyle: UIBarButtonItem.Style? = nil,
                  extendTapAreaBy extendByValue: CGFloat = 0) {
         self.title = title
         self.image = image
+        self.secondLineAttributes = secondLineAttributes
         self.systemItem = systemItem
         self.systemStyle = systemStyle
         
@@ -66,12 +74,12 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
     }
     
     // MARK: - Factory methods
-    public static func title(_ title: String, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
-        return UIBarButtonItemType(title: title, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
+    public static func title(_ title: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(title: title, secondLineAttributes: secondLineAttributes, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
     }
     
-    public static func titleAndImage(_ title: String, image: UIImage, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
-        return UIBarButtonItemType(title: title, image: image, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
+    public static func titleAndImage(_ title: String, image: UIImage, secondLineAttributes: [NSAttributedString.Key : Any]? = nil, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(title: title, image: image, secondLineAttributes: secondLineAttributes, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
     }
     
     public static func image(_ image: UIImage, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
