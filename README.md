@@ -84,7 +84,7 @@ public var bottomAnchor: NSLayoutYAxisAnchor? {
 }
 ```
 
-To dock your views to the manually created navigation bar, use
+To dock your views to the manually created navigation bar, , use this method after you use set(..):
 ```
 func dockViewToNavigationBar(_ view: UIView, constant: CGFloat)
 ```
@@ -99,11 +99,11 @@ func change(leftItems items: [UIBarButtonItemType], animated: Bool)
 func change(rightItems items: [UIBarButtonItemType], animated: Bool)
 ```
 
-By default, large titles are disabled. To enable large titles in a view controller, use:
+By default, large titles are disabled. To enable large titles in a view controller, use this method after you use set(..):
 ```
 func setLargeTitle(andDock view: UIView?)
 ```
-Currently we only support large titme view modes = .never and .always.
+Currently we only support large title view modes .never and .always.
 Because we handle the background of the navigation bar as separate views, .automatic is not fully supported, making the large title go out of bounds and display under your content.
 
 #### UINavigationBarItemType - how does it work
