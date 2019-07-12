@@ -304,15 +304,11 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-NavigationAndStyle_Example/Pods-NavigationAndStyle_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/NavigationAndStyle/NavigationAndStyle.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NavigationAndStyle.framework",
 			);

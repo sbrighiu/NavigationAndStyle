@@ -62,13 +62,13 @@ extension UINavigationController {
         if self.interactivePopGestureRecognizer?.state == .began {
             popDoneWithTouch = true
         } else {
-            viewController.triggerColorStyleRefresh(with: navigationController.navigationBar, navItem: viewController.navigationItem)
+            viewController.triggerNavigationBarStyleRefresh(with: navigationController.navigationBar, navItem: viewController.navigationItem)
         }
     }
     
     public func navigationControllerAction(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         if popDoneWithTouch {
-            viewController.triggerColorStyleRefresh(with: navigationController.navigationBar, navItem: viewController.navigationItem)
+            viewController.triggerNavigationBarStyleRefresh(with: navigationController.navigationBar, navItem: viewController.navigationItem)
         }
         blockAnimations[uniqueIdentifier] = false
     }

@@ -9,12 +9,12 @@ extension UIImageView {
     internal static func build(with type: UINavigationBarGenericItem,
                                target: Any?,
                                action selector: Selector?,
-                               and colorStyle: ColorStyle) -> UIImageView {
+                               and style: NavigationBarStyle) -> UIImageView {
         let newImage = createImageView(target: target,
                                        selector: selector)
         
         newImage.saveItemType(type)
-        return newImage.configure(with: colorStyle)
+        return newImage.configure(with: style)
     }
     
     private static func createImageView(target: Any?, selector: Selector?) -> UIImageView {
@@ -30,14 +30,14 @@ extension UIImageView {
         return newImage
     }
     
-    @discardableResult internal func configure(with colorStyle: ColorStyle) -> UIImageView {
+    @discardableResult internal func configure(with style: NavigationBarStyle) -> UIImageView {
         if let image = self.navItemType?.image {
             self.image = image
         }
         
         self.contentMode = .scaleAspectFit
         self.clipsToBounds = true
-        self.tintColor = colorStyle.imageTint
+        self.tintColor = style.imageTint
         
         return self
     }

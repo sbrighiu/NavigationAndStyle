@@ -5,23 +5,23 @@
 import Foundation
 import UIKit
 
-@objc protocol CanHaveColorStyle {
-    func getColorStyle() -> ColorStyle
+@objc protocol CanHaveNavigationBarStyle {
+    func getNavigationBarStyle() -> NavigationBarStyle
 }
 
-extension UIViewController: CanHaveColorStyle {
-    open func getColorStyle() -> ColorStyle {
-        return navigationController?.getColorStyle() ??
-            ColorStyle.global
+extension UIViewController: CanHaveNavigationBarStyle {
+    open func getNavigationBarStyle() -> NavigationBarStyle {
+        return navigationController?.getNavigationBarStyle() ??
+            NavigationBarStyle.global
     }
 }
 
-open class ColorStyle: NSObject {
+open class NavigationBarStyle: NSObject {
     // MARK: - Convenience styles
-    public static var global = ColorStyle.default
+    public static var global = NavigationBarStyle.default
     
-    public static var `default`: ColorStyle = {
-        return ColorStyle(statusBarStyle: .default,
+    public static var `default`: NavigationBarStyle = {
+        return NavigationBarStyle(statusBarStyle: .default,
                           backgroundColor: Defaults.navigationBarBackgroundColor,
                           hairlineSeparatorColor: Defaults.hairlineSeparatorColor)
     }()
@@ -34,8 +34,8 @@ open class ColorStyle: NSObject {
                                    buttonTitleColor: UIColor = Defaults.blueColor,
                                    imageTint: UIColor = Defaults.blueColor,
                                    highlightAlpha: CGFloat = Defaults.highlightAlpha,
-                                   disabledColor: UIColor = Defaults.disabledColor) -> ColorStyle {
-        return ColorStyle(statusBarStyle: statusBarStyle,
+                                   disabledColor: UIColor = Defaults.disabledColor) -> NavigationBarStyle {
+        return NavigationBarStyle(statusBarStyle: statusBarStyle,
                           backgroundColor: .clear,
                           hairlineSeparatorColor: .clear,
                           shadow: shadow,
@@ -129,8 +129,8 @@ open class ColorStyle: NSObject {
                 buttonTitleColor: UIColor? = nil,
                 imageTint: UIColor = Defaults.nullColor,
                 highlightAlpha: CGFloat? = nil,
-                disabledColor: UIColor? = nil) -> ColorStyle {
-        return ColorStyle(statusBarStyle: statusBarStyle ?? self.statusBarStyle,
+                disabledColor: UIColor? = nil) -> NavigationBarStyle {
+        return NavigationBarStyle(statusBarStyle: statusBarStyle ?? self.statusBarStyle,
                           backgroundColor: backgroundColor ?? self.backgroundColor,
                           backgroundImage: backgroundImage !== Defaults.nullImage ? backgroundImage : self.backgroundImage,
                           backgroundMaskColor: backgroundMaskColor ?? self.backgroundMaskColor,
@@ -155,7 +155,12 @@ open class ColorStyle: NSObject {
     public func highlightColor(for color: UIColor) -> UIColor {
         return Defaults.highlightColor(for: color, highlightAlpha: highlightAlpha)
     }
-    
+
+    public var titleAttributes: [NSAttributedString.Key : Any] {
+        return [.foregroundColor: titleColor,
+                .font: titleFont]
+    }
+
     // MARK: - Default values for global style
     public class Defaults {
         public static var highlightAlpha: CGFloat = 0.66

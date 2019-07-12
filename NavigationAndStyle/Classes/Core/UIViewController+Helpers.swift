@@ -18,13 +18,13 @@ extension UIViewController {
 extension UIViewController {
     
     internal func addBackgroundAndMaskView(to superView: UIView) -> (UIImageView, UIImageView) {
-        let colorStyle = getColorStyle()
+        let style = getNavigationBarStyle()
         
         let backgroundImageView = UIImageView(frame: .zero)
-        backgroundImageView.backgroundColor = colorStyle.backgroundColor
+        backgroundImageView.backgroundColor = style.backgroundColor
         backgroundImageView.contentMode = .scaleAspectFill
         backgroundImageView.clipsToBounds = true
-        backgroundImageView.image = colorStyle.backgroundImage
+        backgroundImageView.image = style.backgroundImage
         backgroundImageView.isUserInteractionEnabled = false
         
         navigationElements.backgroundImageView = backgroundImageView
@@ -39,11 +39,11 @@ extension UIViewController {
             ])
         
         let maskImageView = UIImageView(frame: .zero)
-        maskImageView.backgroundColor = colorStyle.backgroundMaskColor
+        maskImageView.backgroundColor = style.backgroundMaskColor
         maskImageView.contentMode = .scaleAspectFill
         maskImageView.clipsToBounds = true
-        maskImageView.alpha = colorStyle.backgroundMaskAlpha
-        maskImageView.image = colorStyle.backgroundMaskImage
+        maskImageView.alpha = style.backgroundMaskAlpha
+        maskImageView.image = style.backgroundMaskImage
         maskImageView.isUserInteractionEnabled = false
         
         navigationElements.backgroundMaskImageView = maskImageView
@@ -64,7 +64,7 @@ extension UIViewController {
     }
     
     internal func addHairlineSeparator(_ superView: UIView, _ maskView: UIImageView) {
-        let hairlineSeparatorColor = getColorStyle().hairlineSeparatorColor
+        let hairlineSeparatorColor = getNavigationBarStyle().hairlineSeparatorColor
         
         let hairlineView = UIView(frame: .zero)
         hairlineView.contentMode = .scaleAspectFill
@@ -82,7 +82,7 @@ extension UIViewController {
             hairlineView.topAnchor.constraint(equalTo: maskView.bottomAnchor),
             hairlineView.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
             hairlineView.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
-            hairlineView.heightAnchor.constraint(equalToConstant: ColorStyle.Defaults.heightOfHairlineSeparator)
+            hairlineView.heightAnchor.constraint(equalToConstant: NavigationBarStyle.Defaults.heightOfHairlineSeparator)
             ])
     }
     
@@ -91,8 +91,8 @@ extension UIViewController {
         shadowView.backgroundColor = .clear
         shadowView.contentMode = .scaleToFill
         shadowView.clipsToBounds = true
-        shadowView.image = ColorStyle.Defaults.backgroundShadow
-        shadowView.tintColor = getColorStyle().shadow
+        shadowView.image = NavigationBarStyle.Defaults.backgroundShadow
+        shadowView.tintColor = getNavigationBarStyle().shadow
         shadowView.isUserInteractionEnabled = false
         
         navigationElements.shadowBackgroundView = shadowView
@@ -133,16 +133,46 @@ extension UIViewController {
         navigationElements.modalNavigationBar = navBar
         
         navBar.translatesAutoresizingMaskIntoConstraints = false
+        navBar.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 750), for: .vertical)
+        navBar.setContentHuggingPriority(UILayoutPriority(rawValue: 750), for: .vertical)
         
         NSLayoutConstraint.activate([
             navBar.topAnchor.constraint(equalTo: superView.safeAreaLayoutGuide.topAnchor),
             navBar.leadingAnchor.constraint(equalTo: superView.leadingAnchor),
-            navBar.trailingAnchor.constraint(equalTo: superView.trailingAnchor)
+            navBar.trailingAnchor.constraint(equalTo: superView.trailingAnchor),
             ])
         
         shadowView?.bottomAnchor.constraint(equalTo: navBar.bottomAnchor, constant: Constants.shadowExtraHeight).isActive = true
         
         backgroundImageView.bottomAnchor.constraint(equalTo: navBar.bottomAnchor).isActive = true
+    }
+
+    internal func dockViewToNavigationBarAction(_ view: UIView, constant: CGFloat) {
+        view.translatesAutoresizingMaskIntoConstraints = false
+        let constant = view.topAnchor.constraint(equalTo: navigationElements.bottomAnchor ?? self.view.safeAreaLayoutGuide.topAnchor, constant: constant)
+        constant.isActive = true
+    }
+
+    // TODO: - Ignore navigationBarStyle and implement .automatic for largeTitleDisplayMode
+    internal func setLargeTitleAction(andDock view: UIView? = nil) {
+        if let view = view {
+            dockViewToNavigationBar(view, constant: 0)
+        }
+        if let _ = navigationElements.modalNavigationBar {
+            logFrameworkWarning("Setting a large title without a navigation controller does not seem possible. Please embed the current UIViewController inside an UINavigationController if the large title design is required. Cancelling requested style change. Replace with dockViewToNavigationBar(_,constant:)... we did :)")
+            return
+        }
+
+        if self.navigationItem.titleView != nil && self.title?.isEmpty == true {
+            logFrameworkWarning("Activating large titles without using a .title('<text>') will result in an empty large title!")
+        }
+
+        getNavigationBar()?.prefersLargeTitles = true
+        self.navigationItem.largeTitleDisplayMode = .always
+
+//        if let view = view {
+//            self.view.sendSubviewToBack(view)
+//        }
     }
 }
 
@@ -160,7 +190,7 @@ extension UIViewController {
                                     target: target,
                                     action: selector,
                                     isLeft: nil,
-                                    and: getColorStyle())
+                                    and: getNavigationBarStyle())
         
         if !type.isTappable {
             button.isUserInteractionEnabled = false
@@ -180,10 +210,11 @@ extension UIViewController {
         let imageView = UIImageView.build(with: type,
                                           target: target,
                                           action: selector,
-                                          and: getColorStyle())
+                                          and: getNavigationBarStyle())
         
         getNavigationItem().titleView = imageView
     }
+
 }
 
 // MARK: - NavigationElementsModel management

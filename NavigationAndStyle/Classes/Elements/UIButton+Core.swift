@@ -10,13 +10,13 @@ extension UIButton {
                                target: Any?,
                                action selector: Selector?,
                                isLeft: Bool?,
-                               and colorStyle: ColorStyle) -> UIButton {
+                               and style: NavigationBarStyle) -> UIButton {
         let newButton = createButton(target: target,
                                      selector: selector,
                                      forEvent: (type as? UIBarButtonItemType) != nil ? .touchDown : .touchUpInside)
         
         newButton.saveItemType(type)
-        return newButton.configure(with: colorStyle, isLeft: isLeft)
+        return newButton.configure(with: style, isLeft: isLeft)
     }
     
     private static func createButton(target: Any?,
@@ -35,7 +35,7 @@ extension UIButton {
         return newButton
     }
     
-    @discardableResult internal func configure(with colorStyle: ColorStyle, isLeft: Bool?) -> UIButton {
+    @discardableResult internal func configure(with style: NavigationBarStyle, isLeft: Bool?) -> UIButton {
         guard let genericType = genericItemType else { return self }
         
         let targetTitle = genericType.title ?? ""
@@ -49,12 +49,12 @@ extension UIButton {
             }
             self.contentEdgeInsets = type.contentInsets(forLeftElement: isLeft)
             
-            font = colorStyle.buttonFont
-            color = colorStyle.buttonTitleColor
+            font = style.buttonFont
+            color = style.buttonTitleColor
             
         } else if let _ = navItemType {
-            font = colorStyle.titleFont
-            color = colorStyle.titleColor
+            font = style.titleFont
+            color = style.titleColor
             
         } else {
             logFrameworkError("Button was not configured properly.")
@@ -63,7 +63,7 @@ extension UIButton {
         
         if let image = genericType.image {
             self.setImage(image, for: .normal)
-            self.imageView?.configure(with: colorStyle)
+            self.imageView?.configure(with: style)
         }
         
         var firstLine: String
@@ -96,8 +96,8 @@ extension UIButton {
         
         for (state, color) in [
             (UIControl.State.normal, color),
-            (.disabled, colorStyle.disabledColor),
-            (.highlighted, colorStyle.highlightColor(for: color))
+            (.disabled, style.disabledColor),
+            (.highlighted, style.highlightColor(for: color))
             ] {
                 let firstLineAttr = [NSAttributedString.Key.font: font,
                                      NSAttributedString.Key.foregroundColor: color]

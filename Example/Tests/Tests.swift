@@ -36,7 +36,7 @@ class Tests: XCTestCase {
     
     // MARK: - Setup test case
     override func setUp() {
-        ColorStyle.global = ColorStyle(statusBarStyle: .default,
+        NavigationBarStyle.global = NavigationBarStyle(statusBarStyle: .default,
                                        backgroundColor: .clear,
                                        shadow: .black,
                                        titleColor: .white,
@@ -46,14 +46,14 @@ class Tests: XCTestCase {
     
     // MARK: - Test setup
     func test_setupNotCalled() {
-        ColorStyle.global = ColorStyle.transparent().new(backgroundImage: nil)
+        NavigationBarStyle.global = NavigationBarStyle.transparent().new(backgroundImage: nil)
         
         makeSUT()
         XCTAssertFalse(rootVC.didSetupCustomNavigationAndStyle)
     }
     
     func test_setup() {
-        ColorStyle.global = ColorStyle()
+        NavigationBarStyle.global = NavigationBarStyle()
         
         makeSUT()
         rootVC.set(title: anyTitleItem)
@@ -61,7 +61,7 @@ class Tests: XCTestCase {
     }
     
     func test_setupWithTitle() {
-        ColorStyle.global = ColorStyle.default
+        NavigationBarStyle.global = NavigationBarStyle.default
         
         makeSUT()
         rootVC.set(title: anyTitleItem)
@@ -104,7 +104,7 @@ class Tests: XCTestCase {
         
         XCTAssert(rootNavVC.navigationElements.bottomAnchor != nil)
         
-        ColorStyle.global = ColorStyle.default
+        NavigationBarStyle.global = NavigationBarStyle.default
         
         makeNavSUT()
         rootNavVC.set(title: anyTitleItem,

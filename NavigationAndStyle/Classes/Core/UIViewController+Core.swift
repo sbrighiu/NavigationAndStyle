@@ -9,9 +9,12 @@ protocol NavigationVC {
     var navigationElements: NavigationVCModel { get }
     var navigationController: UINavigationController? { get }
     
-    func triggerColorStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
+    func triggerNavigationBarStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
     
     func set(title: UINavigationBarItemType, leftItems: [UIBarButtonItemType], rightItems: [UIBarButtonItemType])
+    
+    func dockViewToNavigationBar(_ view: UIView, constant: CGFloat)
+    func setLargeTitle(andDock view: UIView?)
     
     func change(title type: UINavigationBarItemType)
     func change(leftItems items: [UIBarButtonItemType], animated: Bool)
@@ -39,18 +42,29 @@ extension UIViewController: NavigationVC {
         
         getNavigationBar()?.setupAndChangeToTransparent()
         
-        triggerColorStyleRefresh()
+        triggerNavigationBarStyleRefresh()
         didSetupDict[uniqueIdentifier] = true
     }
     
     internal func checkSetupStatus() {
         if !didSetupCustomNavigationAndStyle {
-            logFrameworkWarning("Always use .set(...) to initialize navigation elements with the ColorStyle chosen.")
+            logFrameworkWarning("Always use .set(...) to initialize navigation elements with the NavigationBarStyle chosen.")
         }
     }
     
+    // MARK: - Dock UI in modals to the navigation bar created
+    public func dockViewToNavigationBar(_ view: UIView, constant: CGFloat) {
+        dockViewToNavigationBarAction(view, constant: constant)
+    }
+    
+    // MARK: - Activate large title
+    /// This function will set .prefersLargeTitles on the current navigationController. By default all navigationItems's largeTitleDisplayMode is set to .never
+    public func setLargeTitle(andDock view: UIView?) {
+        setLargeTitleAction(andDock: view)
+    }
+    
     // MARK: - Handle initial setup of navigation elements and style
-    public func set(title type: UINavigationBarItemType = .label(""),
+    public func set(title type: UINavigationBarItemType = .title(""),
                     leftItems: [UIBarButtonItemType] = [],
                     rightItems: [UIBarButtonItemType] = []) {
         if let navC = self.navigationController {
@@ -63,19 +77,28 @@ extension UIViewController: NavigationVC {
         change(title: type)
         change(leftItems: leftItems)
         change(rightItems: rightItems)
+        
+        self.navigationItem.largeTitleDisplayMode = .never
     }
     
     // MARK: - Handle changes in titleView
     public func change(title type: UINavigationBarItemType) {
         checkSetupStatus()
         
+        getNavigationBar()?.titleTextAttributes = getNavigationBarStyle().titleAttributes
+        
         if let _ = type.title {
             addButtonTitleView(with: type)
         } else if let _ = type.image {
             addTitleImageView(with: type)
         } else {
-            logFrameworkError("This UINavigationBarItemType was not treated")
+            getNavigationItem().titleView = nil
+            if type.nativeTitle == nil {
+                logFrameworkError("This UINavigationBarItemType was not treated")
+            }
         }
+        
+        self.title = type.nativeTitle ?? ""
     }
     
     // MARK: - Handle changes in navigation bar items
@@ -94,7 +117,7 @@ extension UIViewController: NavigationVC {
     
     // MARK: - Handle actions and button creation
     private func get(navBarItems items: [UIBarButtonItemType], isLeft: Bool) -> [UIBarButtonItem] {
-        let colorStyle = getColorStyle()
+        let style = getNavigationBarStyle()
         return items.map {
             return UIBarButtonItem.buildSystemItem(with: $0,
                                                    target: self,
@@ -102,7 +125,7 @@ extension UIViewController: NavigationVC {
                                                     ? #selector(pressedNavLeft(item:))
                                                     : #selector(pressedNavRight(item:))),
                                                    isLeft: isLeft,
-                                                   and: colorStyle).0
+                                                   and: style).0
         }
     }
     
@@ -168,14 +191,14 @@ extension UIViewController: CanHandleVCNavigationActions {
     }
 }
 
-// MARK: - Handle ColorStyle refresh
+// MARK: - Handle NavigationBarStyle refresh
 extension UIViewController {
-    @objc open func triggerColorStyleRefresh(with navBar: UINavigationBar? = nil, navItem: UINavigationItem? = nil) {
-        triggerColorStyleRefreshAction(with: navBar, navItem: navItem)
+    @objc open func triggerNavigationBarStyleRefresh(with navBar: UINavigationBar? = nil, navItem: UINavigationItem? = nil) {
+        triggerNavigationBarStyleRefreshAction(with: navBar, navItem: navItem)
     }
     
-    public func triggerColorStyleRefreshAction(with navBar: UINavigationBar?, navItem: UINavigationItem?) {
-        let colorStyle = getColorStyle()
+    public func triggerNavigationBarStyleRefreshAction(with navBar: UINavigationBar?, navItem: UINavigationItem?) {
+        let style = getNavigationBarStyle()
         
         let navItem = getNavigationItem(overrideIfExists: navItem)
         guard let navBar = self.getNavigationBar(overrideIfExists: navBar) else {
@@ -183,52 +206,52 @@ extension UIViewController {
             return
         }
         
-        navBar.barStyle = colorStyle.barStyle
-        updateUI(of: navBar, navItem: navItem, with: colorStyle)
+        navBar.barStyle = style.barStyle
+        updateUI(of: navBar, navItem: navItem, with: style)
     }
     
-    internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with colorStyle: ColorStyle) {
+    internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with style: NavigationBarStyle) {
         // Setup background using the mask
         if let backgroundImageView = navigationElements.backgroundImageView {
-            if backgroundImageView.backgroundColor != colorStyle.backgroundColor {
-                backgroundImageView.backgroundColor = colorStyle.backgroundColor
+            if backgroundImageView.backgroundColor != style.backgroundColor {
+                backgroundImageView.backgroundColor = style.backgroundColor
             }
-            if backgroundImageView.image != colorStyle.backgroundImage {
-                backgroundImageView.image = colorStyle.backgroundImage
+            if backgroundImageView.image != style.backgroundImage {
+                backgroundImageView.image = style.backgroundImage
             }
         }
         
         if let maskImageView = navigationElements.backgroundMaskImageView {
-            if maskImageView.backgroundColor != colorStyle.backgroundMaskColor {
-                maskImageView.backgroundColor = colorStyle.backgroundMaskColor
+            if maskImageView.backgroundColor != style.backgroundMaskColor {
+                maskImageView.backgroundColor = style.backgroundMaskColor
             }
-            if maskImageView.image != colorStyle.backgroundMaskImage {
-                maskImageView.image = colorStyle.backgroundMaskImage
+            if maskImageView.image != style.backgroundMaskImage {
+                maskImageView.image = style.backgroundMaskImage
             }
-            if maskImageView.alpha != colorStyle.backgroundMaskAlpha {
-                maskImageView.alpha = colorStyle.backgroundMaskAlpha
+            if maskImageView.alpha != style.backgroundMaskAlpha {
+                maskImageView.alpha = style.backgroundMaskAlpha
             }
         }
         
-        if let hairlineView = navigationElements.hairlineSeparatorView, hairlineView.backgroundColor != colorStyle.hairlineSeparatorColor {
-            hairlineView.backgroundColor = colorStyle.hairlineSeparatorColor
+        if let hairlineView = navigationElements.hairlineSeparatorView, hairlineView.backgroundColor != style.hairlineSeparatorColor {
+            hairlineView.backgroundColor = style.hairlineSeparatorColor
         }
         
-        if let shadowView = navigationElements.shadowBackgroundView, shadowView.tintColor != colorStyle.shadow  {
-            shadowView.tintColor = colorStyle.shadow
+        if let shadowView = navigationElements.shadowBackgroundView, shadowView.tintColor != style.shadow  {
+            shadowView.tintColor = style.shadow
         }
         
         // Update navigation bar buttons
         let updateBarButtonItemsBlock: ((UIBarButtonItem, Bool)->()) = { item, isLeft in
             guard let _ = item.barItemType else { return }
             
-            item.button?.configure(with: colorStyle, isLeft: isLeft)
+            item.button?.configure(with: style, isLeft: isLeft)
         }
         
         navItem.leftBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, true) })
         navItem.rightBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, false) })
         
         // Update custom titleView
-        (getNavigationItem().titleView as? UIButton)?.configure(with: colorStyle, isLeft: nil)
+        (getNavigationItem().titleView as? UIButton)?.configure(with: style, isLeft: nil)
     }
 }

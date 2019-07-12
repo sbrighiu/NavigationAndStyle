@@ -17,6 +17,7 @@ public protocol UINavigationBarGenericItem {
 public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
     public let image: UIImage?
+    public let nativeTitle: String?
     
     public let secondLineAttributes: [NSAttributedString.Key : Any]?
     
@@ -25,11 +26,13 @@ public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     
     fileprivate init(title: String? = nil,
                      image: UIImage? = nil,
+                     nativeTitle: String? = nil,
                      secondLineAttributes: [NSAttributedString.Key : Any]? = nil,
                      isTappable: Bool,
                      autoDismiss: Bool) {
         self.title = title
         self.image = image
+        self.nativeTitle = nativeTitle
         
         self.secondLineAttributes = secondLineAttributes
         
@@ -39,6 +42,22 @@ public class UINavigationBarItemType: NSObject, UINavigationBarGenericItem {
     }
     
     // MARK: - Factory methods
+    public static func title(_ title: String) -> UINavigationBarItemType {
+        return UINavigationBarItemType(nativeTitle: title, isTappable: false, autoDismiss: false)
+    }
+
+    public static func largeTitle(_ title: String, andLabelTitle labelTitle: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil) -> UINavigationBarItemType {
+        return UINavigationBarItemType(title: labelTitle, nativeTitle: title, secondLineAttributes: secondLineAttributes, isTappable: false, autoDismiss: false)
+    }
+
+    public static func largeTitle(_ title: String, andButtonTitle buttonTitle: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil, autoDismiss: Bool = false) -> UINavigationBarItemType {
+        return UINavigationBarItemType(title: buttonTitle, nativeTitle: title, secondLineAttributes: secondLineAttributes, isTappable: true, autoDismiss: autoDismiss)
+    }
+
+    public static func largeTitle(_ title: String, andImage image: UIImage, isTappable: Bool = false, autoDismiss: Bool = false) -> UINavigationBarItemType {
+        return UINavigationBarItemType(image: image, nativeTitle: title, isTappable: isTappable, autoDismiss: autoDismiss)
+    }
+
     public static func label(_ title: String, secondLineAttributes: [NSAttributedString.Key : Any]? = nil) -> UINavigationBarItemType {
         return UINavigationBarItemType(title: title, secondLineAttributes: secondLineAttributes, isTappable: false, autoDismiss: false)
     }
