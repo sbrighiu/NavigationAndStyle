@@ -79,7 +79,7 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
     public let title: String?
     public let image: UIImage?
     
-    public let secondLineAttributes: [NSAttributedString.Key : Any]?
+    public let secondLineAttributes: [NSAttributedString.Key: Any]?
     
     public let systemItem: UIBarButtonItem.SystemItem?
     public let systemStyle: UIBarButtonItem.Style?
@@ -136,5 +136,21 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
             }
         }
         return .zero
+    }
+
+    // MARK: - Convenience
+    public struct generic {
+        public static func back(autoDismiss: Bool = true) -> UIBarButtonItemType {
+            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: autoDismiss)
+        }
+        public static func close(autoDismiss: Bool = true) -> UIBarButtonItemType {
+            return .image(UIImage.NavigationAndStyle.close, autoDismiss: autoDismiss)
+        }
+        public static var forward: UIBarButtonItemType {
+            return .image(UIImage.NavigationAndStyle.forwardArrow, autoDismiss: false)
+        }
+        public static var settings: UIBarButtonItemType {
+            return .image(UIImage.NavigationAndStyle.settings, autoDismiss: false)
+        }
     }
 }

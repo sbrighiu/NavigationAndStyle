@@ -7,26 +7,17 @@ import NavigationAndStyle
 
 private extension UIBarButtonItemType {
     struct left {
-        static let close: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.close, autoDismiss: true)
-        }()
-        static let back: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
-        }()
         static let backWithText: UIBarButtonItemType = {
             return .titleAndImage(NSLocalizedString("Back", comment: ""), image: UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
         }()
         static let backWithTwoLinesText: UIBarButtonItemType = {
             return .titleAndImage(NSLocalizedString("Back\nto the future", comment: ""), image: UIImage.NavigationAndStyle.backArrow, secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)], autoDismiss: true)
         }()
-        static let settings: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.settings)
-        }()
     }
     
     struct right {
         static let cancel: UIBarButtonItemType = {
-            return .systemItem(UIBarButtonItem.SystemItem.cancel)
+            return .systemItem(.cancel)
         }()
         static let dismiss: UIBarButtonItemType = {
             return .title(NSLocalizedString("Dismiss", comment: ""), autoDismiss: true)
@@ -90,7 +81,7 @@ class ViewController: UIViewController {
         if let navC = self.navigationController {
             if let scrollView = scrollView {
                 set(title: UINavigationBarItemType.middle.twoRowLabel2,
-                    leftItems: [UIBarButtonItemType.left.settings])
+                    leftItems: [UIBarButtonItemType.generic.settings])
                 setLargeTitle(andDock: scrollView)
             } else {
             if UIApplication.shared.delegate?.window??.rootViewController != self.navigationController {
@@ -104,12 +95,12 @@ class ViewController: UIViewController {
                 }
             } else if navC.viewControllers.count == 1 {
                 set(title: .title("Simple native title"),
-                    leftItems: [UIBarButtonItemType.left.settings])
+                    leftItems: [UIBarButtonItemType.generic.settings])
                 setLargeTitle(andDock: nil)
 
             } else if navC.viewControllers.count == 2 {
                 set(title: UINavigationBarItemType.middle.button,
-                    leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
+                    leftItems: [UIBarButtonItemType.generic.back()],
                     rightItems: [UIBarButtonItemType.right.cancel])
                 
             } else if navC.viewControllers.count == 3 {
@@ -132,11 +123,11 @@ class ViewController: UIViewController {
         } else {
             if let scrollView = scrollView {
                 set(title: UINavigationBarItemType.middle.twoRowLabel2,
-                    leftItems: [UIBarButtonItemType.left.settings])
+                    leftItems: [UIBarButtonItemType.generic.settings])
                 dockViewToNavigationBar(scrollView, constant: 0)
             } else {
                 set(title: UINavigationBarItemType.middle.button,
-                    leftItems: [UIBarButtonItemType.left.close])
+                    leftItems: [UIBarButtonItemType.right.cancel])
             }
         }
     }
