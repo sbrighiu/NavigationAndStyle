@@ -136,6 +136,8 @@ Currently, we can choose from
 - a button with image and text
 - a systemItem
 
+You can call `.barItemType` on `UIBarButtonItem` objects to fetch their type.
+
 Other options not listed like custom views/buttons/raw barButtonItems are left to the developer to handle as they see fit for their use case, as adding options for them limit their usage.
 
 Tapping the bar items will call `navBarItemPressed(with type: UIBarButtonItemType, isLeft: Bool)`, unless the `autoDismiss` parameter is used.
