@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NavigationAndStyle'
-  s.version          = '1.1.1'
+  s.version          = '1.1.2'
   s.summary          = "Extension on UIViewController that allows the easy addition, configuration and styling of an UINavigationBar."
   
   # This description is used to generate tags and improve search results.
