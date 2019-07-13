@@ -15,10 +15,13 @@ protocol NavigationVC {
     
     func dockViewToNavigationBar(_ view: UIView, constant: CGFloat)
     func setLargeTitle(andDock view: UIView?)
+    func setShrinkOnScroll(basedOn scrollView: UIScrollView)
     
     func change(title type: UINavigationBarItemType)
     func change(leftItems items: [UIBarButtonItemType], animated: Bool)
     func change(rightItems items: [UIBarButtonItemType], animated: Bool)
+
+    func checkIfLargeTitleIsVisible(_ completion: (Bool)->())
     
     func shouldAutomaticallyDismissFor(_ navBarItemType: UINavigationBarGenericItem) -> Bool
 }
@@ -51,18 +54,7 @@ extension UIViewController: NavigationVC {
             logFrameworkWarning("Always use .set(...) to initialize navigation elements with the NavigationBarStyle chosen.")
         }
     }
-    
-    // MARK: - Dock UI in modals to the navigation bar created
-    public func dockViewToNavigationBar(_ view: UIView, constant: CGFloat) {
-        dockViewToNavigationBarAction(view, constant: constant)
-    }
-    
-    // MARK: - Activate large title
-    /// This function will set .prefersLargeTitles on the current navigationController. By default all navigationItems's largeTitleDisplayMode is set to .never
-    public func setLargeTitle(andDock view: UIView?) {
-        setLargeTitleAction(andDock: view)
-    }
-    
+
     // MARK: - Handle initial setup of navigation elements and style
     public func set(title type: UINavigationBarItemType = .title(""),
                     leftItems: [UIBarButtonItemType] = [],
@@ -164,6 +156,39 @@ extension UIViewController: NavigationVC {
             return
         }
         logFrameworkError("Failed to get type for title action")
+    }
+
+}
+
+extension UIViewController {
+
+    /// Dock UI in modals to the navigation bar created by the framework. This step needs to be dont programatically.
+    public func dockViewToNavigationBar(_ view: UIView, constant: CGFloat) {
+        dockViewToNavigationBarAction(view, constant: constant)
+    }
+
+    /// By default all navigationItems's largeTitleDisplayMode is set to .never. Calling this method will activate large title view.
+    /// - NOTE: - Custom background views implemented using this framework do not strech and the large title will go out of the bounds when scrolling outside scrollview bounds. To force shrinking use setShrinkOnScroll(basedOn:).
+    public func setLargeTitle(andDock view: UIView? = nil) {
+        setLargeTitleAction(andDock: view)
+    }
+
+    /// Force shrink on scroll.
+    public func setShrinkOnScroll(basedOn scrollView: UIScrollView) {
+        setShrinkOnScrollAction(basedOn: scrollView)
+    }
+
+    /// To use, please place in viewWillLayoutSubviews(). Consult README.md for more details.
+    public func checkIfLargeTitleIsVisible(_ completion: (Bool)->()) {
+        guard self.navigationController != nil else {
+            logFrameworkWarning("This feature is only available for screens embeded in a UINavigationController.")
+            return
+        }
+        guard let navBarHeight = navigationController?.navigationBar.frame.height,
+            didSetupCustomNavigationAndStyle else {
+                return
+        }
+        completion(navBarHeight > 59.75)
     }
 }
 

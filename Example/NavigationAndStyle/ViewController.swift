@@ -64,7 +64,25 @@ class ViewController: UIViewController {
     @IBOutlet weak var scrollView: UIScrollView?
 
     var alternativeStyle: Bool = false
-    
+
+    var shrinkCase: Bool = false
+
+    override func viewWillLayoutSubviews() {
+        if shrinkCase {
+            self.checkIfLargeTitleIsVisible { [weak self] largeTitleActive in
+                if largeTitleActive, navigationItem.rightBarButtonItem?.barItemType == nil {
+                    self?.change(leftItems: [])
+                    self?.change(rightItems: [UIBarButtonItemType.generic.settings])
+                } else if !largeTitleActive, navigationItem.leftBarButtonItem?.barItemType == nil {
+                    self?.change(leftItems: [UIBarButtonItemType.generic.settings])
+                    self?.change(rightItems: [])
+                }
+            }
+        }
+
+        super.viewWillLayoutSubviews()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -80,45 +98,63 @@ class ViewController: UIViewController {
         
         if let navC = self.navigationController {
             if let scrollView = scrollView {
-                set(title: UINavigationBarItemType.middle.twoRowLabel2,
-                    leftItems: [UIBarButtonItemType.generic.settings])
+                shrinkCase = true
+                set(title: UINavigationBarItemType.middle.twoRowLabel2)
                 setLargeTitle(andDock: scrollView)
-            } else {
-            if UIApplication.shared.delegate?.window??.rootViewController != self.navigationController {
-                set(title: UINavigationBarItemType.middle.twoRowButton,
-                    rightItems: [UIBarButtonItemType.right.dismiss,
-                                 UIBarButtonItemType.right.temp])
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                    self?.change(rightItems: [UIBarButtonItemType.right.new,
-                                              UIBarButtonItemType.right.dismiss])
-                }
-            } else if navC.viewControllers.count == 1 {
-                set(title: .title("Simple native title"),
-                    leftItems: [UIBarButtonItemType.generic.settings])
-                setLargeTitle(andDock: nil)
+                setShrinkOnScroll(basedOn: scrollView)
 
-            } else if navC.viewControllers.count == 2 {
-                set(title: UINavigationBarItemType.middle.button,
-                    leftItems: [UIBarButtonItemType.generic.back()],
-                    rightItems: [UIBarButtonItemType.right.cancel])
-                
-            } else if navC.viewControllers.count == 3 {
-                set(title: UINavigationBarItemType.middle.imageView,
-                    leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
-                    rightItems: [UIBarButtonItemType.right.cancel])
-                setLargeTitle(andDock: nil)
-                
-            } else if navC.viewControllers.count == 4 {
-                set(title: UINavigationBarItemType.middle.imageViewButton,
-                    leftItems: [UIBarButtonItemType.left.backWithText],
-                    rightItems: [UIBarButtonItemType.right.cancel])
-                
+                // MARK: - Possible fix for out of bounds large title
+                if let mainView = scrollView.subviews.first {
+                    let possibleDesignFixForLargeTitle = UIView()
+                    possibleDesignFixForLargeTitle.backgroundColor = .white
+
+                    scrollView.addSubview(possibleDesignFixForLargeTitle)
+
+                    possibleDesignFixForLargeTitle.translatesAutoresizingMaskIntoConstraints = false
+                    NSLayoutConstraint.activate([
+                        possibleDesignFixForLargeTitle.bottomAnchor.constraint(equalTo: mainView.topAnchor),
+                        possibleDesignFixForLargeTitle.leftAnchor.constraint(equalTo: mainView.leftAnchor),
+                        possibleDesignFixForLargeTitle.widthAnchor.constraint(equalToConstant: 250),
+                        possibleDesignFixForLargeTitle.heightAnchor.constraint(equalToConstant: 28)
+                        ])
+                }
+
             } else {
-                set(title: UINavigationBarItemType.middle.label,
-                    leftItems: [UIBarButtonItemType.left.backWithText],
-                    rightItems: [UIBarButtonItemType.right.cancel])
-            }
+                if UIApplication.shared.delegate?.window??.rootViewController != self.navigationController {
+                    set(title: UINavigationBarItemType.middle.twoRowButton,
+                        rightItems: [UIBarButtonItemType.right.dismiss,
+                                     UIBarButtonItemType.right.temp])
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                        self?.change(rightItems: [UIBarButtonItemType.right.new,
+                                                  UIBarButtonItemType.right.dismiss])
+                    }
+                } else if navC.viewControllers.count == 1 {
+                    set(title: .title("Simple native title"),
+                        leftItems: [UIBarButtonItemType.generic.settings])
+                    setLargeTitle(andDock: nil)
+
+                } else if navC.viewControllers.count == 2 {
+                    set(title: UINavigationBarItemType.middle.button,
+                        leftItems: [UIBarButtonItemType.generic.back()],
+                        rightItems: [UIBarButtonItemType.right.cancel])
+
+                } else if navC.viewControllers.count == 3 {
+                    set(title: UINavigationBarItemType.middle.imageView,
+                        leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
+                        rightItems: [UIBarButtonItemType.right.cancel])
+                    setLargeTitle(andDock: nil)
+
+                } else if navC.viewControllers.count == 4 {
+                    set(title: UINavigationBarItemType.middle.imageViewButton,
+                        leftItems: [UIBarButtonItemType.left.backWithText],
+                        rightItems: [UIBarButtonItemType.right.cancel])
+
+                } else {
+                    set(title: UINavigationBarItemType.middle.label,
+                        leftItems: [UIBarButtonItemType.left.backWithText],
+                        rightItems: [UIBarButtonItemType.right.cancel])
+                }
             }
         } else {
             if let scrollView = scrollView {
@@ -184,55 +220,55 @@ class ViewController: UIViewController {
         if navigationController == nil {
             if let _ = scrollView {
                 return NavigationBarStyle(statusBarStyle: .default,
-                                  backgroundColor: .white,
-                                  titleColor: .black,
-                                  buttonTitleColor: .black,
-                                  imageTint: .black)
+                                          backgroundColor: .white,
+                                          titleColor: .black,
+                                          buttonTitleColor: .black,
+                                          imageTint: .black)
             } else {
                 self.view.backgroundColor = .black
                 if alternativeStyle {
                     return NavigationBarStyle.transparent(statusBarStyle: .lightContent,
-                                                  titleColor: .white,
-                                                  buttonTitleColor: .white,
-                                                  imageTint: .white)
+                                                          titleColor: .white,
+                                                          buttonTitleColor: .white,
+                                                          imageTint: .white)
                 } else {
                     return NavigationBarStyle(statusBarStyle: .default,
-                                      backgroundColor: .white,
-                                      titleColor: .black,
-                                      buttonTitleColor: .black,
-                                      imageTint: .black)
+                                              backgroundColor: .white,
+                                              titleColor: .black,
+                                              buttonTitleColor: .black,
+                                              imageTint: .black)
                 }
             }
         } else {
             if navigationController?.viewControllers.count == 1 {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                  backgroundImage: UIImage(named: "example-image")!,
-                                  backgroundMaskColor: UIColor.red,
-                                  backgroundMaskAlpha: 0.7,
-                                  titleColor: .white,
-                                  buttonTitleColor: .white,
-                                  imageTint: .white)
+                                          backgroundImage: UIImage(named: "example-image")!,
+                                          backgroundMaskColor: UIColor.red,
+                                          backgroundMaskAlpha: 0.7,
+                                          titleColor: .white,
+                                          buttonTitleColor: .white,
+                                          imageTint: .white)
                 
             } else if navigationController?.viewControllers.count == 2 {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                  backgroundColor: .red,
-                                  titleColor: .white,
-                                  buttonTitleColor: .white,
-                                  imageTint: .white)
+                                          backgroundColor: .red,
+                                          titleColor: .white,
+                                          buttonTitleColor: .white,
+                                          imageTint: .white)
                 
             } else if navigationController?.viewControllers.count == 3 {
                 return NavigationBarStyle.transparent(statusBarStyle: .lightContent,
-                                              shadow: UIColor.black.withAlphaComponent(0.33),
-                                              titleColor: .white,
-                                              buttonTitleColor: .white,
-                                              imageTint: .white)
+                                                      shadow: UIColor.black.withAlphaComponent(0.33),
+                                                      titleColor: .white,
+                                                      buttonTitleColor: .white,
+                                                      imageTint: .white)
                 
             } else if navigationController?.viewControllers.count == 4 {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                  backgroundColor: .black,
-                                  titleColor: .white,
-                                  buttonTitleColor: .white,
-                                  imageTint: .white)
+                                          backgroundColor: .black,
+                                          titleColor: .white,
+                                          buttonTitleColor: .white,
+                                          imageTint: .white)
                 
             }
         }

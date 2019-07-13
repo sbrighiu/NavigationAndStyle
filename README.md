@@ -103,10 +103,25 @@ By default, large titles are disabled. To enable large titles in a view controll
 ```
 func setLargeTitle(andDock view: UIView?)
 ```
-Currently we only support large title view modes .never and .always.
-Because we handle the background of the navigation bar as separate views, .automatic is not fully supported, making the large title go out of bounds and display under your content.
+Because we handle the background of the navigation bar as separate views, shrinking while scrolling will make the large title go out of bounds and display under your content.
+To force shrinking while scrolling, call `setShrinkOnScroll(basedOn:)`. With a bit of design updates (like updating the background of the content below the navigation bar with the textColor of the title text) the existing option could be enough for the majority of cases.
 
-To force shrinking while scrolling, call `self.view.sendSubviewToBack(<scrollView>)`. With a bit of design updates (like updating the background of the content below the navigation bar with the textColor of the title text) the existing option could be enough for the majority of cases.
+To change navigation bar items when state changes between showing large title and normal title, use this example (changing left items):
+```
+override func viewWillLayoutSubviews() {
+    self.checkIfLargeTitleIsVisible { [weak self] largeTitleActive in
+    if largeTitleActive, navigationItem.leftBarButtonItem?.barItemType != <saved large title item type> {
+            change(leftItems: [<saved large title item type>])
+        } else !largeTitleActive, navigationItem.leftBarButtonItem?.barItemType != <saved normal title item type> {
+            change(leftItems: [<saved normal title item type>])
+        }
+    }
+        
+    // ...
+    
+    super.viewWillLayoutSubviews()
+}
+```
 
 #### UINavigationBarItemType - how does it work
 

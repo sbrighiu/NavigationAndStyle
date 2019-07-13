@@ -153,7 +153,6 @@ extension UIViewController {
         constant.isActive = true
     }
 
-    // TODO: - Ignore navigationBarStyle and implement .automatic for largeTitleDisplayMode
     internal func setLargeTitleAction(andDock view: UIView? = nil) {
         if let view = view {
             dockViewToNavigationBar(view, constant: 0)
@@ -169,10 +168,10 @@ extension UIViewController {
 
         getNavigationBar()?.prefersLargeTitles = true
         self.navigationItem.largeTitleDisplayMode = .always
+    }
 
-//        if let view = view {
-//            self.view.sendSubviewToBack(view)
-//        }
+    internal func setShrinkOnScrollAction(basedOn scrollView: UIScrollView) {
+        self.view.sendSubviewToBack(scrollView)
     }
 }
 
