@@ -10,11 +10,11 @@ extension UIImageView {
                                target: Any?,
                                action selector: Selector?,
                                and style: NavigationBarStyle) -> UIImageView {
-        let newImage = createImageView(target: target,
+        let newImageView = createImageView(target: target,
                                        selector: selector)
-        
-        newImage.saveItemType(type)
-        return newImage.configure(with: style)
+        newImageView.image = type.image
+        newImageView.saveItemType(type)
+        return newImageView.configure(with: style)
     }
     
     private static func createImageView(target: Any?, selector: Selector?) -> UIImageView {

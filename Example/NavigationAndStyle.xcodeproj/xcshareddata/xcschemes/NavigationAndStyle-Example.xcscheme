@@ -14,21 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "14AFEDD4F06C9B56986DB3A81C6BC659"
-               BuildableName = "Resources.bundle"
-               BlueprintName = "NavigationAndStyle-Resources"
-               ReferencedContainer = "container:Pods/Pods.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F64D5286DE940F938428335AE6B42A69"
+               BlueprintIdentifier = "ACC3E5564C9B97A72BE9D7ED0BC4210F"
                BuildableName = "NavigationAndStyle.framework"
                BlueprintName = "NavigationAndStyle"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -50,10 +36,10 @@
          </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
-            buildForRunning = "YES"
+            buildForRunning = "NO"
             buildForProfiling = "NO"
             buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
+            buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
@@ -74,7 +60,7 @@
       <CodeCoverageTargets>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F64D5286DE940F938428335AE6B42A69"
+            BlueprintIdentifier = "ACC3E5564C9B97A72BE9D7ED0BC4210F"
             BuildableName = "NavigationAndStyle.framework"
             BlueprintName = "NavigationAndStyle"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">

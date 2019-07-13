@@ -14,27 +14,28 @@ extension UIBarButtonItem: IsNavigationBarItem {
                                          target: Any,
                                          action: Selector,
                                          isLeft: Bool,
-                                         and style: NavigationBarStyle) -> (UIBarButtonItem, UIButton?) {
+                                         and style: NavigationBarStyle) -> UIBarButtonItem {
         let newItem: UIBarButtonItem!
-        var newButton: UIButton?
         if let systemItem = type.systemItem {
             newItem = UIBarButtonItem(barButtonSystemItem: systemItem, target: target, action: action)
             newItem.tintColor = style.buttonTitleColor
             if let style = type.systemStyle {
                 newItem.style = style
             }
-        } else {
+        } else if let _ = type.title {
             let button = UIButton.build(with: type,
                                         target: target,
                                         action: action,
                                         isLeft: isLeft,
                                         and: style)
             newItem = UIBarButtonItem(customView: button)
-            newButton = button
             newItem.tintColor = style.buttonTitleColor
+        } else {
+            newItem = UIBarButtonItem(image: type.image, style: .plain, target: target, action: action)
+            newItem.tintColor = style.imageTint
         }
         
         newItem.saveItemType(type)
-        return (newItem, newButton)
+        return newItem
     }
 }

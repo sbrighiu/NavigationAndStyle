@@ -206,7 +206,7 @@ class Tests: XCTestCase {
     func test_buttonActions() {
         let barItemLeftType1 = UIBarButtonItemType.title(anyText)
         let barItemLeftType2 = UIBarButtonItemType.title(otherText)
-        let barItemRightType = UIBarButtonItemType.image(anyImage)
+        let barItemRightType = UIBarButtonItemType.titleAndImage(anyText, image: anyImage)
         
         let exp = expectation(description: "waiting")
         exp.expectedFulfillmentCount = 3

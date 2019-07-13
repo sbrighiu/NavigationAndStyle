@@ -118,8 +118,8 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
         return UIBarButtonItemType(title: title, image: image, secondLineAttributes: secondLineAttributes, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
     }
     
-    public static func image(_ image: UIImage, extendTapAreaBy: CGFloat = 0, autoDismiss: Bool = false) -> UIBarButtonItemType {
-        return UIBarButtonItemType(image: image, autoDismiss: autoDismiss, extendTapAreaBy: extendTapAreaBy)
+    public static func image(_ image: UIImage, autoDismiss: Bool = false) -> UIBarButtonItemType {
+        return UIBarButtonItemType(image: image, autoDismiss: autoDismiss)
     }
     
     public static func systemItem(_ type: UIBarButtonItem.SystemItem, systemStyle: UIBarButtonItem.Style = .plain, autoDismiss: Bool = false) -> UIBarButtonItemType {

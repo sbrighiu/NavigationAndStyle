@@ -8,10 +8,10 @@ import NavigationAndStyle
 private extension UIBarButtonItemType {
     struct left {
         static let close: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.close, extendTapAreaBy: 24, autoDismiss: true)
+            return .image(UIImage.NavigationAndStyle.close, autoDismiss: true)
         }()
         static let back: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.backArrow, extendTapAreaBy: 32, autoDismiss: true)
+            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
         }()
         static let backWithText: UIBarButtonItemType = {
             return .titleAndImage(NSLocalizedString("Back", comment: ""), image: UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
@@ -20,7 +20,7 @@ private extension UIBarButtonItemType {
             return .titleAndImage(NSLocalizedString("Back\nto the future", comment: ""), image: UIImage.NavigationAndStyle.backArrow, secondLineAttributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.75)], autoDismiss: true)
         }()
         static let settings: UIBarButtonItemType = {
-            return .image(UIImage.NavigationAndStyle.settings, extendTapAreaBy: 24)
+            return .image(UIImage.NavigationAndStyle.settings)
         }()
     }
     

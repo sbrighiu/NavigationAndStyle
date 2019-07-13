@@ -125,12 +125,17 @@ extension UIViewController: NavigationVC {
                                                     ? #selector(pressedNavLeft(item:))
                                                     : #selector(pressedNavRight(item:))),
                                                    isLeft: isLeft,
-                                                   and: style).0
+                                                   and: style)
         }
     }
     
     @objc internal func pressedNavLeft(item: Any) {
         if let item = item as? IsNavigationBarItem, let type = item.barItemType {
+            if shouldAutomaticallyDismissFor(type) { return }
+            navBarItemPressed(with: type, isLeft: true)
+            return
+        }
+        if let item = (item as? UITapGestureRecognizer)?.view, let type = item.barItemType {
             if shouldAutomaticallyDismissFor(type) { return }
             navBarItemPressed(with: type, isLeft: true)
             return
@@ -142,6 +147,11 @@ extension UIViewController: NavigationVC {
         if let item = item as? IsNavigationBarItem, let type = item.barItemType {
             if shouldAutomaticallyDismissFor(type) { return }
             navBarItemPressed(with: type, isLeft: false)
+            return
+        }
+        if let item = (item as? UITapGestureRecognizer)?.view, let type = item.barItemType {
+            if shouldAutomaticallyDismissFor(type) { return }
+            navBarItemPressed(with: type, isLeft: true)
             return
         }
         logFrameworkError("Failed to get type for right button action")
@@ -246,6 +256,10 @@ extension UIViewController {
             guard let _ = item.barItemType else { return }
             
             item.button?.configure(with: style, isLeft: isLeft)
+            (item.customView as? UIImageView)?.configure(with: style)
+            if let _ = item.image {
+                item.tintColor = style.imageTint
+            }
         }
         
         navItem.leftBarButtonItems?.forEach({ updateBarButtonItemsBlock($0, true) })
