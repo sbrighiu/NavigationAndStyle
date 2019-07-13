@@ -34,4 +34,6 @@ Pod::Spec.new do |s|
   s.resource_bundle = {
     'Resources' => ['NavigationAndStyle/**/*.{lproj,storyboard,xcdatamodeld,xib,xcassets,json}']
   }
+
+  s.swift_versions = ['5.0']
 end
