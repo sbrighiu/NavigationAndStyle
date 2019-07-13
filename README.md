@@ -106,6 +106,8 @@ func setLargeTitle(andDock view: UIView?)
 Currently we only support large title view modes .never and .always.
 Because we handle the background of the navigation bar as separate views, .automatic is not fully supported, making the large title go out of bounds and display under your content.
 
+To force shrinking while scrolling, call `self.view.sendSubviewToBack(<scrollView>)`. With a bit of design updates (like updating the background of the content below the navigation bar with the textColor of the title text) the existing option could be enough for the majority of cases.
+
 #### UINavigationBarItemType - how does it work
 
 This class was created to define types for titleView elements possible using this extension. 
