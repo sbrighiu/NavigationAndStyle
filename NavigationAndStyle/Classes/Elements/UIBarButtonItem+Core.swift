@@ -38,4 +38,8 @@ extension UIBarButtonItem: IsNavigationBarItem {
         newItem.saveItemType(type)
         return newItem
     }
+
+    public var barItemType: UIBarButtonItemType? {
+        return navBarItemTypes[uniqueIdentifier] as? UIBarButtonItemType
+    }
 }

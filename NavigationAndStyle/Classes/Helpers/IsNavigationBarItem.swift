@@ -4,7 +4,7 @@
 
 import Foundation
 
-private var navBarItemTypes = [Int: UINavigationBarGenericItem]()
+internal var navBarItemTypes = [Int: UINavigationBarGenericItem]()
 
 internal protocol IsNavigationBarItem: Identifiable {
     var navItemType: UINavigationBarItemType? { get }
