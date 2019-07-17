@@ -140,17 +140,24 @@ public class UIBarButtonItemType: NSObject, UINavigationBarGenericItem {
 
     // MARK: - Convenience
     public struct generic {
-        public static func back(autoDismiss: Bool = true) -> UIBarButtonItemType {
-            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: autoDismiss)
-        }
-        public static func close(autoDismiss: Bool = true) -> UIBarButtonItemType {
-            return .image(UIImage.NavigationAndStyle.close, autoDismiss: autoDismiss)
-        }
-        public static var forward: UIBarButtonItemType {
+        public static var back: UIBarButtonItemType = {
+            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: true)
+        }()
+        public static var close: UIBarButtonItemType = {
+            return .image(UIImage.NavigationAndStyle.close, autoDismiss: true)
+        }()
+        public static var noAutoDismissBack: UIBarButtonItemType = {
+            return .image(UIImage.NavigationAndStyle.backArrow, autoDismiss: false)
+        }()
+        public static var noAutoDismissClose: UIBarButtonItemType = {
+            return .image(UIImage.NavigationAndStyle.close, autoDismiss: false)
+        }()
+        public static var forward: UIBarButtonItemType = {
             return .image(UIImage.NavigationAndStyle.forwardArrow, autoDismiss: false)
-        }
-        public static var settings: UIBarButtonItemType {
+        }()
+        public static var settings: UIBarButtonItemType = {
             return .image(UIImage.NavigationAndStyle.settings, autoDismiss: false)
-        }
+        }()
+
     }
 }

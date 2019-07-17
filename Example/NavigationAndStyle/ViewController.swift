@@ -136,7 +136,7 @@ class ViewController: UIViewController {
 
                 } else if navC.viewControllers.count == 2 {
                     set(title: UINavigationBarItemType.middle.button,
-                        leftItems: [UIBarButtonItemType.generic.back()],
+                        leftItems: [UIBarButtonItemType.generic.back],
                         rightItems: [UIBarButtonItemType.right.cancel])
 
                 } else if navC.viewControllers.count == 3 {

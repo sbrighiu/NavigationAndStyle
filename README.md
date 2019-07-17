@@ -243,11 +243,16 @@ We have 5 assets included in the form of images in struct `UIImage.NavigationAnd
 - close icon
 - background shadow image used for navigation bar background
 
-We have 4 generic bar button items defined under `UIBarButtonItemType.generic`:
-- back (autodismiss: Bool = true)
-- close (autodismiss: Bool = true)
-- forward (autodismiss = false)
-- settings (autodismiss = false)
+We have 6 generic bar button items defined under `UIBarButtonItemType.generic`:
+(autodismiss = true)
+- back
+- close
+
+(autodismiss = false)
+- noAutoDismissBack
+- noAutoDismissClose
+- forward
+- settings
 
 NavigationBarStyle uses default values located in struct `NavigationBarStyle.Defaults`, declared as static variables:
 - highlightAlpha: CGFloat = 0.66
