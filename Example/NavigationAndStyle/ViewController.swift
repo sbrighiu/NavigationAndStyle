@@ -222,6 +222,7 @@ class ViewController: UIViewController {
                 return NavigationBarStyle(statusBarStyle: .default,
                                           backgroundColor: .white,
                                           titleColor: .black,
+                                          largeTitleColor: .black,
                                           buttonTitleColor: .black,
                                           imageTint: .black)
             } else {
@@ -229,23 +230,37 @@ class ViewController: UIViewController {
                 if alternativeStyle {
                     return NavigationBarStyle.transparent(statusBarStyle: .lightContent,
                                                           titleColor: .white,
+                                                          largeTitleColor: .white,
                                                           buttonTitleColor: .white,
                                                           imageTint: .white)
                 } else {
                     return NavigationBarStyle(statusBarStyle: .default,
                                               backgroundColor: .white,
                                               titleColor: .black,
+                                              largeTitleColor: .black,
                                               buttonTitleColor: .black,
                                               imageTint: .black)
                 }
             }
         } else {
-            if navigationController?.viewControllers.count == 1 {
+            if let _ = scrollView {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
                                           backgroundImage: UIImage(named: "example-image")!,
                                           backgroundMaskColor: UIColor.red,
                                           backgroundMaskAlpha: 0.7,
                                           titleColor: .white,
+                                          largeTitleFont: UIFont.boldSystemFont(ofSize: 54),
+                                          largeTitleColor: .white,
+                                          buttonTitleColor: .white,
+                                          imageTint: .white)
+
+            } else if navigationController?.viewControllers.count == 1 {
+                return NavigationBarStyle(statusBarStyle: .lightContent,
+                                          backgroundImage: UIImage(named: "example-image")!,
+                                          backgroundMaskColor: UIColor.red,
+                                          backgroundMaskAlpha: 0.7,
+                                          titleColor: .white,
+                                          largeTitleColor: .white,
                                           buttonTitleColor: .white,
                                           imageTint: .white)
                 
@@ -253,6 +268,7 @@ class ViewController: UIViewController {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
                                           backgroundColor: .red,
                                           titleColor: .white,
+                                          largeTitleColor: .white,
                                           buttonTitleColor: .white,
                                           imageTint: .white)
                 
@@ -260,6 +276,7 @@ class ViewController: UIViewController {
                 return NavigationBarStyle.transparent(statusBarStyle: .lightContent,
                                                       shadow: UIColor.black.withAlphaComponent(0.33),
                                                       titleColor: .white,
+                                                      largeTitleColor: .white,
                                                       buttonTitleColor: .white,
                                                       imageTint: .white)
                 
@@ -267,6 +284,7 @@ class ViewController: UIViewController {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
                                           backgroundColor: .black,
                                           titleColor: .white,
+                                          largeTitleColor: .white,
                                           buttonTitleColor: .white,
                                           imageTint: .white)
                 

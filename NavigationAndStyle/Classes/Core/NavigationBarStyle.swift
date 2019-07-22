@@ -30,6 +30,8 @@ open class NavigationBarStyle: NSObject {
                                    shadow: UIColor = .clear,
                                    titleFont: UIFont = Defaults.titleFont,
                                    titleColor: UIColor = Defaults.darkTextColor,
+                                   largeTitleFont: UIFont = Defaults.largeTitleFont,
+                                   largeTitleColor: UIColor = Defaults.darkTextColor,
                                    buttonFont: UIFont = Defaults.buttonFont,
                                    buttonTitleColor: UIColor = Defaults.blueColor,
                                    imageTint: UIColor = Defaults.blueColor,
@@ -41,6 +43,8 @@ open class NavigationBarStyle: NSObject {
                           shadow: shadow,
                           titleFont: titleFont,
                           titleColor: titleColor,
+                          largeTitleFont: largeTitleFont,
+                          largeTitleColor: largeTitleColor,
                           buttonFont: buttonFont,
                           buttonTitleColor: buttonTitleColor,
                           imageTint: imageTint,
@@ -61,6 +65,8 @@ open class NavigationBarStyle: NSObject {
     
     public let titleFont: UIFont
     public let titleColor: UIColor
+    public let largeTitleFont: UIFont
+    public let largeTitleColor: UIColor
     public let buttonFont: UIFont
     public let buttonTitleColor: UIColor
     public let imageTint: UIColor
@@ -78,6 +84,8 @@ open class NavigationBarStyle: NSObject {
                 shadow: UIColor = .clear,
                 titleFont: UIFont = Defaults.titleFont,
                 titleColor: UIColor = Defaults.darkTextColor,
+                largeTitleFont: UIFont = Defaults.largeTitleFont,
+                largeTitleColor: UIColor = Defaults.darkTextColor,
                 buttonFont: UIFont = Defaults.buttonFont,
                 buttonTitleColor: UIColor = Defaults.blueColor,
                 imageTint: UIColor = Defaults.blueColor,
@@ -108,6 +116,8 @@ open class NavigationBarStyle: NSObject {
         
         self.titleFont = titleFont
         self.titleColor = titleColor
+        self.largeTitleFont = largeTitleFont
+        self.largeTitleColor = largeTitleColor
         self.buttonFont = buttonFont
         self.buttonTitleColor = buttonTitleColor
         self.imageTint = imageTint
@@ -125,6 +135,8 @@ open class NavigationBarStyle: NSObject {
                 shadow: UIColor? = nil,
                 titleFont: UIFont? = nil,
                 titleColor: UIColor? = nil,
+                largeTitleFont: UIFont? = nil,
+                largeTitleColor: UIColor? = nil,
                 buttonFont: UIFont? = nil,
                 buttonTitleColor: UIColor? = nil,
                 imageTint: UIColor = Defaults.nullColor,
@@ -140,6 +152,8 @@ open class NavigationBarStyle: NSObject {
                           shadow: shadow ?? self.shadow,
                           titleFont: titleFont ?? self.titleFont,
                           titleColor: titleColor ?? self.titleColor,
+                          largeTitleFont: largeTitleFont ?? self.largeTitleFont,
+                          largeTitleColor: largeTitleColor ?? self.largeTitleColor,
                           buttonFont: buttonFont ?? self.buttonFont,
                           buttonTitleColor: buttonTitleColor ?? self.buttonTitleColor,
                           imageTint: imageTint !== Defaults.nullColor ? imageTint : self.imageTint,
@@ -161,13 +175,20 @@ open class NavigationBarStyle: NSObject {
                 .font: titleFont]
     }
 
+    public var largeTitleAttributes: [NSAttributedString.Key : Any] {
+        return [.foregroundColor: largeTitleColor,
+                .font: largeTitleFont]
+    }
+
     // MARK: - Default values for global style
     public class Defaults {
         public static var highlightAlpha: CGFloat = 0.66
         internal static func highlightColor(for color: UIColor, highlightAlpha: CGFloat = Defaults.highlightAlpha) -> UIColor {
             return color.withAlphaComponent(highlightAlpha)
         }
-        
+
+        public static var largeTitleFont: UIFont = .boldSystemFont(ofSize: 34)
+
         public static var titleFont: UIFont = .boldSystemFont(ofSize: 17)
         
         public static var buttonFont: UIFont = .systemFont(ofSize: 17)

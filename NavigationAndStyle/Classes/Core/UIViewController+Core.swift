@@ -78,6 +78,7 @@ extension UIViewController: NavigationVC {
         checkSetupStatus()
         
         getNavigationBar()?.titleTextAttributes = getNavigationBarStyle().titleAttributes
+        getNavigationBar()?.largeTitleTextAttributes = getNavigationBarStyle().largeTitleAttributes
         
         if let _ = type.title {
             addButtonTitleView(with: type)
