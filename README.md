@@ -77,7 +77,8 @@ public weak var hairlineSeparatorView: UIView?
 public weak var shadowBackgroundView: UIImageView?
 
 public var bottomAnchor: NSLayoutYAxisAnchor? {
-    if hairlineSeparatorView?.backgroundColor == .clear {
+
+    if hairlineSeparatorView?.backgroundColor?.isEqual(UIColor.clear) == true {
         return backgroundImageView?.bottomAnchor
     }
     return hairlineSeparatorView?.bottomAnchor

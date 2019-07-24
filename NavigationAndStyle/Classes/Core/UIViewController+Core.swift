@@ -249,7 +249,7 @@ extension UIViewController {
     internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with style: NavigationBarStyle) {
         // Setup background using the mask
         if let backgroundImageView = navigationElements.backgroundImageView {
-            if backgroundImageView.backgroundColor != style.backgroundColor {
+            if !(backgroundImageView.backgroundColor?.isEqual(style.backgroundColor) == true) {
                 backgroundImageView.backgroundColor = style.backgroundColor
             }
             if backgroundImageView.image != style.backgroundImage {
@@ -258,7 +258,7 @@ extension UIViewController {
         }
         
         if let maskImageView = navigationElements.backgroundMaskImageView {
-            if maskImageView.backgroundColor != style.backgroundMaskColor {
+            if !(maskImageView.backgroundColor?.isEqual(style.backgroundMaskColor) == true) {
                 maskImageView.backgroundColor = style.backgroundMaskColor
             }
             if maskImageView.image != style.backgroundMaskImage {
@@ -269,11 +269,13 @@ extension UIViewController {
             }
         }
         
-        if let hairlineView = navigationElements.hairlineSeparatorView, hairlineView.backgroundColor != style.hairlineSeparatorColor {
+        if let hairlineView = navigationElements.hairlineSeparatorView,
+            !(hairlineView.backgroundColor?.isEqual(style.hairlineSeparatorColor) == true) {
             hairlineView.backgroundColor = style.hairlineSeparatorColor
         }
         
-        if let shadowView = navigationElements.shadowBackgroundView, shadowView.tintColor != style.shadow  {
+        if let shadowView = navigationElements.shadowBackgroundView,
+            !(shadowView.tintColor?.isEqual(style.shadow) == true) {
             shadowView.tintColor = style.shadow
         }
         

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NavigationAndStyle'
-  s.version          = '1.1.6'
+  s.version          = '1.1.7'
   s.summary          = "Extension on UIViewController that allows the easy addition, configuration and styling of an UINavigationBar."
   
   # This description is used to generate tags and improve search results.
@@ -26,7 +26,6 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Stefan B.' => 'sbrighiu@gmail.com' }
   s.source           = { :git => 'https://github.com/sbrighiu/NavigationAndStyle.git', :tag => s.version.to_s }
-  s.social_media_url = 'https://twitter.com/smbcheeky'
   
   s.ios.deployment_target = '11.0'
   
