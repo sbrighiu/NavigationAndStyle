@@ -295,5 +295,10 @@ extension UIViewController {
         
         // Update custom titleView
         (getNavigationItem().titleView as? UIButton)?.configure(with: style, isLeft: nil)
+        (getNavigationItem().titleView as? UIImageView)?.configure(with: style)
+
+        getNavigationBar()?.titleTextAttributes = getNavigationBarStyle().titleAttributes
+        getNavigationBar()?.largeTitleTextAttributes = getNavigationBarStyle().largeTitleAttributes
+
     }
 }
