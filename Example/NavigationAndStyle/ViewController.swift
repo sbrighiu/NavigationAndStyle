@@ -60,6 +60,11 @@ private extension UINavigationBarItemType {
 var numberOfVC = 0
 
 class ViewController: UIViewController {
+
+    override var isViewLoaded: Bool {
+//        triggerNavigationBarStyleRefreshAction(with: nil, navItem: nil)
+        return super.isViewLoaded
+    }
     
     @IBOutlet weak var scrollView: UIScrollView?
 
@@ -95,13 +100,14 @@ class ViewController: UIViewController {
         if numberOfVC.isMultiple(of: 2) {
             alternativeStyle = true
         }
-        
+
+        // TODO: - example with bg image UIImage(named: "example-image"),
+
         if let navC = self.navigationController {
             if let scrollView = scrollView {
                 shrinkCase = true
                 set(title: UINavigationBarItemType.middle.twoRowLabel2)
-                setLargeTitle(andDock: scrollView)
-                setShrinkOnScroll(basedOn: scrollView)
+                // TODO: - large title and shrink
 
                 // MARK: - Possible fix for out of bounds large title
                 if let mainView = scrollView.subviews.first {
@@ -132,7 +138,7 @@ class ViewController: UIViewController {
                 } else if navC.viewControllers.count == 1 {
                     set(title: .title("Simple native title"),
                         leftItems: [UIBarButtonItemType.generic.settings])
-                    setLargeTitle(andDock: nil)
+                    // TODO: - large title
 
                 } else if navC.viewControllers.count == 2 {
                     set(title: UINavigationBarItemType.middle.button,
@@ -143,7 +149,7 @@ class ViewController: UIViewController {
                     set(title: UINavigationBarItemType.middle.imageView,
                         leftItems: [UIBarButtonItemType.left.backWithTwoLinesText],
                         rightItems: [UIBarButtonItemType.right.cancel])
-                    setLargeTitle(andDock: nil)
+                    // TODO: - large title
 
                 } else if navC.viewControllers.count == 4 {
                     set(title: UINavigationBarItemType.middle.imageViewButton,
@@ -157,10 +163,10 @@ class ViewController: UIViewController {
                 }
             }
         } else {
-            if let scrollView = scrollView {
+            if let _ = scrollView {
                 set(title: UINavigationBarItemType.middle.twoRowLabel2,
                     leftItems: [UIBarButtonItemType.generic.settings])
-                dockViewToNavigationBar(scrollView, constant: 0)
+                // TODO: - dock top?
             } else {
                 set(title: UINavigationBarItemType.middle.button,
                     leftItems: [UIBarButtonItemType.right.cancel])
@@ -220,7 +226,9 @@ class ViewController: UIViewController {
         if navigationController == nil {
             if let _ = scrollView {
                 return NavigationBarStyle(statusBarStyle: .default,
-                                          backgroundColor: .white,
+                                          customBarType: .custom(isTranslucent: false,
+                                                                 bgColor: .white,
+                                                                 shadowImage: nil),
                                           titleColor: .black,
                                           largeTitleColor: .black,
                                           buttonTitleColor: .black,
@@ -235,7 +243,9 @@ class ViewController: UIViewController {
                                                           imageTint: .white)
                 } else {
                     return NavigationBarStyle(statusBarStyle: .default,
-                                              backgroundColor: .white,
+                                              customBarType: .custom(isTranslucent: false,
+                                                                     bgColor: .white,
+                                                                     shadowImage: nil),
                                               titleColor: .black,
                                               largeTitleColor: .black,
                                               buttonTitleColor: .black,
@@ -245,9 +255,9 @@ class ViewController: UIViewController {
         } else {
             if let _ = scrollView {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                          backgroundImage: UIImage(named: "example-image")!,
-                                          backgroundMaskColor: UIColor.red,
-                                          backgroundMaskAlpha: 0.7,
+                                          customBarType: .custom(isTranslucent: false,
+                                                                 bgColor: .red,
+                                                                 shadowImage: nil),
                                           titleColor: .white,
                                           largeTitleFont: UIFont.boldSystemFont(ofSize: 54),
                                           largeTitleColor: .white,
@@ -256,9 +266,9 @@ class ViewController: UIViewController {
 
             } else if navigationController?.viewControllers.count == 1 {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                          backgroundImage: UIImage(named: "example-image")!,
-                                          backgroundMaskColor: UIColor.red,
-                                          backgroundMaskAlpha: 0.7,
+                                          customBarType: .custom(isTranslucent: true,
+                                                                 bgColor: .red,
+                                                                 shadowImage: nil),
                                           titleColor: .white,
                                           largeTitleColor: .white,
                                           buttonTitleColor: .white,
@@ -266,23 +276,30 @@ class ViewController: UIViewController {
                 
             } else if navigationController?.viewControllers.count == 2 {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                          backgroundColor: .red,
+                                          customBarType: .custom(isTranslucent: false,
+                                                                 bgColor: .red,
+                                                                 shadowImage: nil),
                                           titleColor: .white,
                                           largeTitleColor: .white,
                                           buttonTitleColor: .white,
                                           imageTint: .white)
                 
             } else if navigationController?.viewControllers.count == 3 {
-                return NavigationBarStyle.transparent(statusBarStyle: .lightContent,
-                                                      shadow: UIColor.black.withAlphaComponent(0.33),
-                                                      titleColor: .white,
-                                                      largeTitleColor: .white,
-                                                      buttonTitleColor: .white,
-                                                      imageTint: .white)
+                return NavigationBarStyle(statusBarStyle: .lightContent,
+                                          customBarType: .custom(isTranslucent: false,
+                                                                 bgColor: .black,
+                                                                 shadowImage: nil),
+                                          // customShadow: UIColor.black.withAlphaComponent(0.33),
+                    titleColor: .white,
+                    largeTitleColor: .white,
+                    buttonTitleColor: .white,
+                    imageTint: .white)
                 
             } else if navigationController?.viewControllers.count == 4 {
                 return NavigationBarStyle(statusBarStyle: .lightContent,
-                                          backgroundColor: .black,
+                                          customBarType: .custom(isTranslucent: false,
+                                                                 bgColor: .black,
+                                                                 shadowImage: nil),
                                           titleColor: .white,
                                           largeTitleColor: .white,
                                           buttonTitleColor: .white,

@@ -16,18 +16,20 @@ extension UIViewController: CanHaveNavigationBarStyle {
     }
 }
 
+// TODO: - declare inside UIViewController
 open class NavigationBarStyle: NSObject {
     // MARK: - Convenience styles
     public static var global = NavigationBarStyle.default
     
     public static var `default`: NavigationBarStyle = {
         return NavigationBarStyle(statusBarStyle: .default,
-                          backgroundColor: Defaults.navigationBarBackgroundColor,
-                          hairlineSeparatorColor: Defaults.hairlineSeparatorColor)
+                                  customBarType: .custom(isTranslucent: true,
+                                                         bgColor: Defaults.navigationBarBackgroundColor,
+                                                         shadowImage: Defaults.hairlineSeparatorColor.image()))
     }()
     
     public static func transparent(statusBarStyle: UIStatusBarStyle = .default,
-                                   shadow: UIColor = .clear,
+                                   customShadow: UIColor = .clear,
                                    titleFont: UIFont = Defaults.titleFont,
                                    titleColor: UIColor = Defaults.darkTextColor,
                                    largeTitleFont: UIFont = Defaults.largeTitleFont,
@@ -38,30 +40,24 @@ open class NavigationBarStyle: NSObject {
                                    highlightAlpha: CGFloat = Defaults.highlightAlpha,
                                    disabledColor: UIColor = Defaults.disabledColor) -> NavigationBarStyle {
         return NavigationBarStyle(statusBarStyle: statusBarStyle,
-                          backgroundColor: .clear,
-                          hairlineSeparatorColor: .clear,
-                          shadow: shadow,
-                          titleFont: titleFont,
-                          titleColor: titleColor,
-                          largeTitleFont: largeTitleFont,
-                          largeTitleColor: largeTitleColor,
-                          buttonFont: buttonFont,
-                          buttonTitleColor: buttonTitleColor,
-                          imageTint: imageTint,
-                          highlightAlpha: highlightAlpha,
-                          disabledColor: disabledColor)
+                                  customBarType: .transparent,
+                                  customShadow: customShadow,
+                                  titleFont: titleFont,
+                                  titleColor: titleColor,
+                                  largeTitleFont: largeTitleFont,
+                                  largeTitleColor: largeTitleColor,
+                                  buttonFont: buttonFont,
+                                  buttonTitleColor: buttonTitleColor,
+                                  imageTint: imageTint,
+                                  highlightAlpha: highlightAlpha,
+                                  disabledColor: disabledColor)
     }
     
     // MARK: - Implementation
     public let statusBarStyle: UIStatusBarStyle
     
-    public let backgroundColor: UIColor
-    public let backgroundImage: UIImage?
-    public let backgroundMaskColor: UIColor
-    public let backgroundMaskImage: UIImage?
-    public let backgroundMaskAlpha: CGFloat
-    public let hairlineSeparatorColor: UIColor
-    public let shadow: UIColor
+    public let customBarType: UINavigationBar.CustomType
+    public let customShadow: UIColor
     
     public let titleFont: UIFont
     public let titleColor: UIColor
@@ -75,13 +71,8 @@ open class NavigationBarStyle: NSObject {
     public let disabledColor: UIColor
     
     public init(statusBarStyle: UIStatusBarStyle = .default,
-                backgroundColor: UIColor = Defaults.navigationBarBackgroundColor,
-                backgroundImage: UIImage? = nil,
-                backgroundMaskColor: UIColor = .clear,
-                backgroundMaskImage: UIImage? = nil,
-                backgroundMaskAlpha: CGFloat = 1.0,
-                hairlineSeparatorColor: UIColor = .clear,
-                shadow: UIColor = .clear,
+                customBarType: UINavigationBar.CustomType,
+                customShadow: UIColor = .clear,
                 titleFont: UIFont = Defaults.titleFont,
                 titleColor: UIColor = Defaults.darkTextColor,
                 largeTitleFont: UIFont = Defaults.largeTitleFont,
@@ -93,24 +84,9 @@ open class NavigationBarStyle: NSObject {
                 disabledColor: UIColor = Defaults.disabledColor) {
         self.statusBarStyle = statusBarStyle
         
-        self.backgroundColor = backgroundColor
-        self.backgroundImage = backgroundImage
-        self.backgroundMaskColor = backgroundMaskColor
-        self.backgroundMaskImage = backgroundMaskImage
-        
-        if backgroundMaskAlpha > 1 {
-            logFrameworkWarning("Alpha value set is bigger than 1. Please fix backgroundMaskAlpha value.")
-            self.backgroundMaskAlpha = 1
-        } else if backgroundMaskAlpha < 0 {
-            logFrameworkWarning("Alpha value set is smaller than 0. Please fix backgroundMaskAlpha value.")
-            self.backgroundMaskAlpha = 0
-        } else {
-            self.backgroundMaskAlpha = backgroundMaskAlpha
-        }
-        
-        self.shadow = shadow
-        self.hairlineSeparatorColor = hairlineSeparatorColor
-    
+        self.customBarType = customBarType
+        self.customShadow = customShadow
+
         self.highlightAlpha = highlightAlpha
         self.disabledColor = disabledColor
         
@@ -126,39 +102,29 @@ open class NavigationBarStyle: NSObject {
     }
     
     public func new(statusBarStyle: UIStatusBarStyle? = nil,
-                backgroundColor: UIColor? = nil,
-                backgroundImage: UIImage? = Defaults.nullImage,
-                backgroundMaskColor: UIColor? = nil,
-                backgroundMaskImage: UIImage? = Defaults.nullImage,
-                backgroundMaskAlpha: CGFloat? = nil,
-                hairlineSeparatorColor: UIColor? = nil,
-                shadow: UIColor? = nil,
-                titleFont: UIFont? = nil,
-                titleColor: UIColor? = nil,
-                largeTitleFont: UIFont? = nil,
-                largeTitleColor: UIColor? = nil,
-                buttonFont: UIFont? = nil,
-                buttonTitleColor: UIColor? = nil,
-                imageTint: UIColor = Defaults.nullColor,
-                highlightAlpha: CGFloat? = nil,
-                disabledColor: UIColor? = nil) -> NavigationBarStyle {
+                    customBarType: UINavigationBar.CustomType? = nil,
+                    customShadow: UIColor? = nil,
+                    titleFont: UIFont? = nil,
+                    titleColor: UIColor? = nil,
+                    largeTitleFont: UIFont? = nil,
+                    largeTitleColor: UIColor? = nil,
+                    buttonFont: UIFont? = nil,
+                    buttonTitleColor: UIColor? = nil,
+                    imageTint: UIColor = Defaults.nullColor,
+                    highlightAlpha: CGFloat? = nil,
+                    disabledColor: UIColor? = nil) -> NavigationBarStyle {
         return NavigationBarStyle(statusBarStyle: statusBarStyle ?? self.statusBarStyle,
-                          backgroundColor: backgroundColor ?? self.backgroundColor,
-                          backgroundImage: backgroundImage !== Defaults.nullImage ? backgroundImage : self.backgroundImage,
-                          backgroundMaskColor: backgroundMaskColor ?? self.backgroundMaskColor,
-                          backgroundMaskImage: backgroundMaskImage !== Defaults.nullImage ? backgroundMaskImage : self.backgroundMaskImage,
-                          backgroundMaskAlpha: backgroundMaskAlpha ?? self.backgroundMaskAlpha,
-                          hairlineSeparatorColor: hairlineSeparatorColor ?? self.hairlineSeparatorColor,
-                          shadow: shadow ?? self.shadow,
-                          titleFont: titleFont ?? self.titleFont,
-                          titleColor: titleColor ?? self.titleColor,
-                          largeTitleFont: largeTitleFont ?? self.largeTitleFont,
-                          largeTitleColor: largeTitleColor ?? self.largeTitleColor,
-                          buttonFont: buttonFont ?? self.buttonFont,
-                          buttonTitleColor: buttonTitleColor ?? self.buttonTitleColor,
-                          imageTint: imageTint !== Defaults.nullColor ? imageTint : self.imageTint,
-                          highlightAlpha: highlightAlpha ?? self.highlightAlpha,
-                          disabledColor: disabledColor ?? self.disabledColor)
+                                  customBarType: customBarType ?? self.customBarType,
+                                  customShadow: customShadow ?? self.customShadow,
+                                  titleFont: titleFont ?? self.titleFont,
+                                  titleColor: titleColor ?? self.titleColor,
+                                  largeTitleFont: largeTitleFont ?? self.largeTitleFont,
+                                  largeTitleColor: largeTitleColor ?? self.largeTitleColor,
+                                  buttonFont: buttonFont ?? self.buttonFont,
+                                  buttonTitleColor: buttonTitleColor ?? self.buttonTitleColor,
+                                  imageTint: imageTint !== Defaults.nullColor ? imageTint : self.imageTint,
+                                  highlightAlpha: highlightAlpha ?? self.highlightAlpha,
+                                  disabledColor: disabledColor ?? self.disabledColor)
     }
     
     // MARK: Convenience methods

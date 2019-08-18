@@ -5,17 +5,12 @@
 import Foundation
 import UIKit
 
-protocol NavigationVC {
-    var navigationElements: NavigationVCModel { get }
+protocol NavigationVC: Identifiable {
     var navigationController: UINavigationController? { get }
     
-    func triggerNavigationBarStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
+    func triggerStyleRefresh(with navBar: UINavigationBar?, navItem: UINavigationItem?)
     
     func set(title: UINavigationBarItemType, leftItems: [UIBarButtonItemType], rightItems: [UIBarButtonItemType])
-    
-    func dockViewToNavigationBar(_ view: UIView, constant: CGFloat)
-    func setLargeTitle(andDock view: UIView?)
-    func setShrinkOnScroll(basedOn scrollView: UIScrollView)
     
     func change(title type: UINavigationBarItemType)
     func change(leftItems items: [UIBarButtonItemType], animated: Bool)
@@ -43,9 +38,9 @@ extension UIViewController: NavigationVC {
     private func setupNavigationAndStyle() {
         self.navigationController?.setupNavigationConvenienceSettings()
         
-        getNavigationBar()?.setupAndChangeToTransparent()
+        getNavigationBar()?.set(getNavigationBarStyle().customBarType)
         
-        triggerNavigationBarStyleRefresh()
+        triggerStyleRefresh()
         didSetupDict[uniqueIdentifier] = true
     }
     
@@ -59,11 +54,6 @@ extension UIViewController: NavigationVC {
     public func set(title type: UINavigationBarItemType = .title(""),
                     leftItems: [UIBarButtonItemType] = [],
                     rightItems: [UIBarButtonItemType] = []) {
-        if let navC = self.navigationController {
-            addNavigationBarComplementElements(of: navC)
-        } else {
-            addOverlayNavigationBarElements(to: self.view)
-        }
         setupNavigationAndStyle()
         
         change(title: type)
@@ -71,6 +61,10 @@ extension UIViewController: NavigationVC {
         change(rightItems: rightItems)
         
         self.navigationItem.largeTitleDisplayMode = .never
+
+        // TODO: - fix large
+        //        getNavigationBar()?.prefersLargeTitles = true
+        //        self.navigationItem.largeTitleDisplayMode = .always
     }
     
     // MARK: - Handle changes in titleView
@@ -163,22 +157,6 @@ extension UIViewController: NavigationVC {
 
 extension UIViewController {
 
-    /// Dock UI in modals to the navigation bar created by the framework. This step needs to be dont programatically.
-    public func dockViewToNavigationBar(_ view: UIView, constant: CGFloat) {
-        dockViewToNavigationBarAction(view, constant: constant)
-    }
-
-    /// By default all navigationItems's largeTitleDisplayMode is set to .never. Calling this method will activate large title view.
-    /// - NOTE: - Custom background views implemented using this framework do not strech and the large title will go out of the bounds when scrolling outside scrollview bounds. To force shrinking use setShrinkOnScroll(basedOn:).
-    public func setLargeTitle(andDock view: UIView? = nil) {
-        setLargeTitleAction(andDock: view)
-    }
-
-    /// Force shrink on scroll.
-    public func setShrinkOnScroll(basedOn scrollView: UIScrollView) {
-        setShrinkOnScrollAction(basedOn: scrollView)
-    }
-
     /// To use, please place in viewWillLayoutSubviews(). Consult README.md for more details.
     public func checkIfLargeTitleIsVisible(_ completion: (Bool)->()) {
         guard self.navigationController != nil else {
@@ -229,7 +207,7 @@ extension UIViewController: CanHandleVCNavigationActions {
 
 // MARK: - Handle NavigationBarStyle refresh
 extension UIViewController {
-    @objc open func triggerNavigationBarStyleRefresh(with navBar: UINavigationBar? = nil, navItem: UINavigationItem? = nil) {
+    @objc open func triggerStyleRefresh(with navBar: UINavigationBar? = nil, navItem: UINavigationItem? = nil) {
         triggerNavigationBarStyleRefreshAction(with: navBar, navItem: navItem)
     }
     
@@ -248,36 +226,7 @@ extension UIViewController {
     
     internal func updateUI(of navBar: UINavigationBar, navItem: UINavigationItem, with style: NavigationBarStyle) {
         // Setup background using the mask
-        if let backgroundImageView = navigationElements.backgroundImageView {
-            if !(backgroundImageView.backgroundColor?.isEqual(style.backgroundColor) == true) {
-                backgroundImageView.backgroundColor = style.backgroundColor
-            }
-            if backgroundImageView.image != style.backgroundImage {
-                backgroundImageView.image = style.backgroundImage
-            }
-        }
-        
-        if let maskImageView = navigationElements.backgroundMaskImageView {
-            if !(maskImageView.backgroundColor?.isEqual(style.backgroundMaskColor) == true) {
-                maskImageView.backgroundColor = style.backgroundMaskColor
-            }
-            if maskImageView.image != style.backgroundMaskImage {
-                maskImageView.image = style.backgroundMaskImage
-            }
-            if maskImageView.alpha != style.backgroundMaskAlpha {
-                maskImageView.alpha = style.backgroundMaskAlpha
-            }
-        }
-        
-        if let hairlineView = navigationElements.hairlineSeparatorView,
-            !(hairlineView.backgroundColor?.isEqual(style.hairlineSeparatorColor) == true) {
-            hairlineView.backgroundColor = style.hairlineSeparatorColor
-        }
-        
-        if let shadowView = navigationElements.shadowBackgroundView,
-            !(shadowView.tintColor?.isEqual(style.shadow) == true) {
-            shadowView.tintColor = style.shadow
-        }
+        navBar.updateCustomStyleIfNeeded(with: style)
         
         // Update navigation bar buttons
         let updateBarButtonItemsBlock: ((UIBarButtonItem, Bool)->()) = { item, isLeft in

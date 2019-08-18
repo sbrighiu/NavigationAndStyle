@@ -1,5 +1,5 @@
 PODS:
-  - NavigationAndStyle (1.1)
+  - NavigationAndStyle (1.2.0)
 
 DEPENDENCIES:
   - NavigationAndStyle (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  NavigationAndStyle: 63df6c180f6679384d954e11c943725c57e0a074
+  NavigationAndStyle: c2584584858d3ca8a5ad01d2bfeafe9c676e7b3c
 
 PODFILE CHECKSUM: 8ba718437802f4557b5583713a040f76e8109ac7
 
-COCOAPODS: 1.7.3
+COCOAPODS: 1.7.5
